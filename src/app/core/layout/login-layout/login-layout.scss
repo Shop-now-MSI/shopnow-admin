@@ -1,0 +1,247 @@
+:host {
+  --primary-blue: #4f46e5;
+  --dark-bg: #0f172a;
+  --text-muted: #64748b;
+  display: block;
+  height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+.login-container {
+  display: flex;
+  height: 100%;
+  background: #fff;
+}
+
+/* --- SECTION GAUCHE --- */
+.brand-section {
+  flex: 0.8;
+  background: linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 60px;
+  color: white;
+}
+
+.brand-content {
+  position: relative;
+  z-index: 2;
+  max-width: 400px;
+}
+
+.logo {
+  position: absolute;
+  top: -450px; /* Ajustement selon le padding */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+  margin-bottom: 15px;
+}
+
+.hero-text p {
+  opacity: 0.8;
+  font-size: 1.1rem;
+}
+
+/* Cercles décoratifs */
+.decorative-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  filter: blur(40px);
+}
+
+.circle-1 { width: 300px; height: 300px; top: 10%; right: 10%; }
+.circle-2 { width: 200px; height: 200px; bottom: -50px; left: 20%; }
+
+/* --- SECTION DROITE --- */
+.form-section {
+  flex: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+header h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+header p {
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+input[type="email"], 
+input[type="password"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+}
+
+.forgot-link {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.options-row {
+  margin: 20px 0;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.btn-primary:hover{
+  background: var(--text-muted);
+  cursor: pointer;
+}
+
+.btn-primary[disabled]:hover, .btn-primary[disabled] {
+  background: var(--text-muted);
+  cursor: not-allowed;  
+}
+
+.divider {
+  text-align: center;
+  position: relative;
+  margin: 25px 0;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px; background: #e2e8f0;
+}
+
+.divider span {
+  position: relative;
+  background: #fff;
+  padding: 0 10px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.social-login {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.btn-outline {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.footer-text {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.footer-text a {
+  color: #000;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Conteneur pour positionner l'icône */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* On ajoute du padding à droite de l'input pour laisser la place à l'icône */
+.input-wrapper input {
+  width: 100%;
+  padding: 12px 45px 12px 16px; /* 45px de padding à droite */
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+/* Style du bouton toggle */
+.toggle-password {
+  position: absolute;
+  right: 12px; /* Espacement depuis le bord droit */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b; /* Couleur grise comme sur l'image */
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: #1e293b; /* Devient plus sombre au survol */
+}
+
+/* Taille de l'icône lucide */
+lucide-icon {
+  width: 20px;
+  height: 20px;
+}

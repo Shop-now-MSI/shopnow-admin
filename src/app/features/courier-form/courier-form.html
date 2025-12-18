@@ -1,0 +1,63 @@
+<div class="form-wrapper">
+  <div class="form-card">
+    <header class="form-header">
+      <h2>Informations du Livreur</h2>
+      <p>Veuillez saisir les informations telles qu'elles figurent sur la pièce d'identité.</p>
+    </header>
+
+    <form class="registration-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="firstName">Prénom</label>
+          <input type="text" id="firstName" placeholder="ex: Alexander">
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Nom de famille</label>
+          <input type="text" id="lastName" placeholder="ex: Smith">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Adresse Email</label>
+          <input type="email" id="email" placeholder="alexander.smith@example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Numéro de Téléphone</label>
+          <input type="tel" id="phone" placeholder="+33 6 00 00 00 00">
+        </div>
+
+        <div class="form-group">
+          <label for="zone">Zone d'affectation</label>
+          <div class="select-container">
+            <select id="zone">
+              <option value="" disabled selected>Choisir une zone</option>
+              <option value="paris_08">Paris 08</option>
+              <option value="lyon_centre">Lyon Centre</option>
+              <option value="marseille_nord">Marseille Nord</option>
+            </select>
+            <lucide-icon [img]="chevronDown" class="select-icon"></lucide-icon>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="status">Statut initial</label>
+          <div class="select-container">
+            <select id="status">
+              <option value="service">En service</option>
+              <option value="offline">Hors ligne</option>
+            </select>
+            <lucide-icon [img]="chevronDown" class="select-icon"></lucide-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <button type="submit" class="btn-submit">
+          Enregistrer le Livreur
+          <lucide-icon [img]="arrowRight"></lucide-icon>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

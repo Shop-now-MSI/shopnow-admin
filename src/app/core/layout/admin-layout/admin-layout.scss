@@ -1,0 +1,141 @@
+:host {
+  --bg-dark: #16181d;
+  --bg-sidebar: #1a1c22;
+  --bg-panel: #1f2228;
+  --accent-blue: #3b82f6;
+  --text-gray: #8b949e;
+  --border-color: #2d3139;
+  display: block;
+}
+
+.admin-wrapper {
+  display: flex;
+  height: 100vh;
+  background-color: var(--bg-dark);
+  color: white;
+  overflow: hidden;
+}
+
+/* SIDEBAR GAUCHE */
+.sidebar {
+  width: 72px;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  z-index: 10;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-bottom: 40px;
+  border: 2px solid var(--border-color);
+}
+
+.nav-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  flex: 1;
+}
+
+.nav-icons a {
+  color: var(--text-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.nav-icons a:hover {
+  color: white;
+}
+
+.nav-icons a.active {
+  background-color: var(--accent-blue);
+  color: white;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.btn-add {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background-color: #10b981; /* Vert comme sur l'image */
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ZONE CENTRALE ET DROITE */
+.main-container {
+  flex: 1;
+  display: flex;
+}
+
+.dynamic-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  background-color: var(--bg-dark);
+}
+
+/* PANNEAU DE DROITE */
+.right-panel {
+  width: 350px;
+  background-color: var(--bg-panel);
+  border-left: 1px solid var(--border-color);
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 30px;
+}
+
+.panel-header h2 {
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.learn-more {
+  font-size: 0.8rem;
+  color: var(--text-gray);
+  text-decoration: none;
+}
+
+.widgets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.widget-slot {
+  width: 100%;
+}
+
+.placeholder-widget {
+  background: rgba(255,255,255,0.03);
+  border: 1px dashed var(--border-color);
+  border-radius: 15px;
+  height: 200px; /* Hauteur temporaire */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+}

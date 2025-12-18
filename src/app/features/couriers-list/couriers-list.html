@@ -1,0 +1,125 @@
+<!-- ========================================== -->
+<!-- COURIERS LIST HTML - HARMONISÉ -->
+<!-- ========================================== -->
+
+<div class="page-container">
+  <!-- HEADER -->
+  <header class="page-header">
+    <div class="header-left">
+      <h1>Gestion des Livreurs</h1>
+      <p>Gérez et suivez les performances de votre flotte de livraison</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-primary" routerLink="/admin/courier-form">
+        <lucide-icon [img]="plus"></lucide-icon>
+        Nouveau Livreur
+      </button>
+    </div>
+  </header>
+
+  <!-- FILTRES -->
+  <section class="filters-bar">
+    <div class="filters-group">
+      <select class="select-filter">
+        <option>Statut: Tous</option>
+        <option>En service</option>
+        <option>Hors ligne</option>
+      </select>
+      
+      <select class="select-filter">
+        <option>Zone: Toutes</option>
+        <option>Paris</option>
+        <option>Lyon</option>
+      </select>
+    </div>
+    
+    <button class="btn-clear">
+      <lucide-icon [img]="trash"></lucide-icon>
+      Effacer tout
+    </button>
+  </section>
+
+  <!-- TABLEAU -->
+  <div class="table-wrapper">
+    @if (canScrollLeft()) {
+      <button class="scroll-btn left" (click)="scrollTable(-200)">
+        <lucide-icon [img]="chevronLeft"></lucide-icon>
+      </button>
+    }
+    @if (canScrollRight()) {
+      <button class="scroll-btn right" (click)="scrollTable(200)">
+        <lucide-icon [img]="chevronRight"></lucide-icon>
+      </button>
+    }
+
+    <div class="table-container" #tableContainer (scroll)="onScroll()">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Livreur</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Zone</th>
+            <th>Livraisons</th>
+            <th>Note</th>
+            <th>Statut</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (courier of displayedCouriers(); track courier.id) {
+            <tr class="table-row">
+              <td>
+                <div class="user-cell">
+                  <img [src]="courier.avatar" alt="" class="user-avatar">
+                  <span class="user-name">{{ courier.name }}</span>
+                </div>
+              </td>
+              <td class="text-muted">{{ courier.email }}</td>
+              <td class="text-muted">{{ courier.phone }}</td>
+              <td>{{ courier.zone }}</td>
+              <td><strong class="highlight">{{ courier.totalDeliveries }}</strong></td>
+              <td>
+                <span class="rating">
+                  <lucide-icon [img]="star" class="star-icon"></lucide-icon>
+                  {{ courier.rating }}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge" [class]="courier.status">
+                  {{ courier.status === 'service' ? 'En service' : 'Hors ligne' }}
+                </span>
+              </td>
+              <td class="text-right">
+                <div class="actions">
+                  <button class="icon-btn edit" title="Modifier">
+                    <lucide-icon [img]="pencil"></lucide-icon>
+                  </button>
+                  <button class="icon-btn delete" title="Supprimer">
+                    <lucide-icon [img]="trash2"></lucide-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAGINATION -->
+  <footer class="pagination">
+    <span class="page-info">Affichage 1-5 sur 12 livreurs</span>
+    <div class="page-controls">
+      <button class="page-btn" [disabled]="true">
+        <lucide-icon [img]="chevronLeft"></lucide-icon>
+      </button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">
+        <lucide-icon [img]="chevronRight"></lucide-icon>
+      </button>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,141 @@
+<!-- ========================================== -->
+<!-- ORDER ASSIGNMENT HTML - HARMONISÉ -->
+<!-- ========================================== -->
+
+<div class="assignment-page">
+  <!-- HEADER -->
+  <header class="page-header">
+    <div class="header-left">
+      <button class="btn-back" title="Retour">
+        <lucide-icon [img]="arrowLeft"></lucide-icon>
+      </button>
+      <div class="header-info">
+        <h1 class="order-id">#56784567</h1>
+        <span class="update-date">Mis à jour le: 16/12/2024, 15:32</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU PRINCIPAL -->
+  <div class="assignment-layout">
+    <!-- COLONNE GAUCHE -->
+    <div class="main-column">
+      <!-- INFORMATIONS CLIENT -->
+      <section class="card">
+        <div class="card-header">
+          <h2>Informations Client</h2>
+          <img 
+            src="https://i.pravatar.cc/150?u=client" 
+            alt="Client Avatar" 
+            class="client-avatar">
+        </div>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Ville</span>
+            <span class="value">Paris, France</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Âge</span>
+            <span class="value">28 ans</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Poids Total</span>
+            <span class="value">12.5 KG</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Profession</span>
+            <span class="value">Ingénieur</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Date de Naissance</span>
+            <span class="value">12.05.1996</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Type de Service</span>
+            <span class="value">Livraison Express</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- FORMULAIRE D'ASSIGNATION -->
+      <section class="card">
+        <h2>Assignation du Livreur</h2>
+        
+        <form class="assignment-form">
+          <div class="form-group">
+            <label>Choisir un Livreur</label>
+            <div class="input-with-icon">
+              <lucide-icon [img]="user" class="input-icon"></lucide-icon>
+              <select class="form-select">
+                <option value="" disabled selected>Sélectionner un livreur disponible</option>
+                <option value="1">Jean Marc Alain (Paris 08)</option>
+                <option value="2">Elliot Møller (Paris 15)</option>
+              </select>
+              <lucide-icon [img]="chevronDown" class="arrow-icon"></lucide-icon>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description / Note interne</label>
+            <textarea 
+              class="form-textarea"
+              placeholder="Ajoutez des instructions spécifiques pour le livreur..."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-accept">
+              Accepter & Assigner
+              <lucide-icon [img]="arrowRight"></lucide-icon>
+            </button>
+            <button type="button" class="btn-reject">
+              Rejeter
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <!-- COLONNE DROITE - RÉCAPITULATIF -->
+    <aside class="sidebar-column">
+      <section class="card">
+        <h2>Récapitulatif Commande</h2>
+        
+        <div class="summary-list">
+          <div class="summary-item main">
+            <span>Produits</span>
+            <span class="value">Electronique</span>
+          </div>
+          
+          <div class="divider"></div>
+          
+          <div class="summary-item">
+            <span>Laptop Pro 16"</span>
+            <span class="value">1,200.00</span>
+          </div>
+          <div class="summary-item">
+            <span>Souris Sans Fil</span>
+            <span class="value">45.50</span>
+          </div>
+          <div class="summary-item">
+            <span>TVA (20%)</span>
+            <span class="value">249.10</span>
+          </div>
+          <div class="summary-item discount">
+            <span>Réduction (PROMO25)</span>
+            <span class="value">-50.00</span>
+          </div>
+          <div class="summary-item">
+            <span>Frais de port</span>
+            <span class="value">15.00</span>
+          </div>
+        </div>
+
+        <div class="total-section">
+          <span class="total-label">Total</span>
+          <span class="total-amount">1,459.60 USD</span>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>

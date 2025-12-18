@@ -1,0 +1,121 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1>My Dashboard</h1>
+    <div class="header-actions">
+      <span class="filter-label">Filter stats</span>
+      <button class="btn-icon-toggle">
+        <lucide-icon [img]="slidersHorizontal"></lucide-icon>
+      </button>
+    </div>
+  </header>
+
+  <section class="chart-card main-stats">
+    <div class="card-header">
+      <div class="title-group">
+        <h2>Total Activity</h2>
+        <div class="toggle-filters">
+          <button class="active">Orders</button>
+          <button>Deliveries</button>
+        </div>
+      </div>
+      <div class="date-filters">
+        <span>from</span>
+        <select>
+          <option>August 2024</option>
+        </select>
+        <span>to</span>
+        <select>
+          <option>May 2025</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="chart-placeholder">
+      <div class="chart-tooltip">2345</div>
+      <svg viewBox="0 0 800 200" class="line-chart">
+        <path d="M0,150 Q100,80 200,130 T400,100 T600,60 T800,110" fill="none" stroke="#3b82f6" stroke-width="3" />
+        <path d="M0,160 Q100,120 200,150 T400,130 T600,100 T800,140" fill="none" stroke="#475569" stroke-width="2" />
+        <circle cx="400" cy="100" r="6" fill="#3b82f6" stroke="white" stroke-width="2"/>
+      </svg>
+      <div class="chart-months">
+        <span>Aug 2024</span><span>Oct 2024</span><span>Dec 2024</span><span>Feb 2025</span><span>Apr 2025</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="bottom-grid">
+    <section class="chart-card couriers-list">
+      <div class="card-header">
+        <h2>Active Couriers</h2>
+        <select class="minimal-select">
+          <option>for August 2025</option>
+        </select>
+      </div>
+
+      <div class="list-container">
+        @for (courier of couriers; track courier.name) {
+          <div class="courier-item">
+            <div class="user-info">
+              <img [src]="courier.avatar" class="avatar-sm">
+              <div class="name-zone">
+                <p class="name">{{ courier.name }}</p>
+                <p class="location">{{ courier.city }}</p>
+              </div>
+              <button class="more-btn">•••</button>
+            </div>
+            <div class="progress-zone">
+              <div class="progress-bar">
+                <div class="fill" [style.width.%]="courier.progress" [style.background-color]="courier.color"></div>
+              </div>
+              <div class="stats-line">
+                <span>Level {{ courier.level }}</span>
+                <strong>{{ courier.deliveryCount }} Points</strong>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="chart-card delivery-status">
+      <div class="card-header">
+        <h2>Delivery Status</h2>
+        <select class="minimal-select">
+          <option>for September 2025</option>
+        </select>
+      </div>
+
+      <div class="status-content">
+        <div class="bar-chart-container">
+          <div class="axis"><span>0%</span><span>50%</span><span>100%</span></div>
+          
+          <div class="status-bar-group">
+            <div class="status-row">
+              <div class="bar"><div class="fill purple" style="width: 63%"></div></div>
+              <span class="pct">63%</span>
+            </div>
+            <div class="status-row">
+              <div class="bar"><div class="fill green" style="width: 47%"></div></div>
+              <span class="pct">47%</span>
+            </div>
+            <div class="status-row">
+              <div class="bar"><div class="fill yellow" style="width: 52%"></div></div>
+              <span class="pct">52%</span>
+            </div>
+            <div class="status-row">
+              <div class="bar"><div class="fill blue" style="width: 81%"></div></div>
+              <span class="pct">81%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-legend">
+          <div class="legend-item"><span class="dot blue"></span> Completed <span class="val">81.57%</span></div>
+          <div class="legend-item"><span class="dot purple"></span> In Progress <span class="val">63.25%</span></div>
+          <div class="legend-item"><span class="dot yellow"></span> Pending <span class="val">52.95%</span></div>
+          <div class="legend-item"><span class="dot green"></span> Canceled <span class="val">47.29%</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,97 @@
+<div class="login-container">
+  <div class="brand-section">
+    <div class="brand-content">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>ShopNow Admin</span>
+      </div>
+      
+      <div class="hero-text">
+        <h1>Faisons quelque chose de magique aujourd'hui !</h1>
+        <p>Manager vos commandes, vos livraisons et vos livreurs comme vous le voulez.</p>
+      </div>
+    </div>
+    <div class="decorative-circle circle-1"></div>
+    <div class="decorative-circle circle-2"></div>
+  </div>
+
+  <div class="form-section">
+    <div class="form-wrapper">
+      <header>
+        <h2>Sign in</h2>
+        <p>Bon retour ! Entrez vos informations ci dessous.</p>
+      </header>
+
+      <form (submit)="onSubmit($event)">
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input 
+            type="email" 
+            id="email" 
+            placeholder="Your email address"
+            [value]="email()"
+            (input)="onEmailChange($event)"
+            required>
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="password">Password</label>
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
+          
+          <div class="input-wrapper">
+            <input 
+              [type]="showPassword() ? 'text' : 'password'" 
+              id="password" 
+              placeholder="Password"
+              [value]="password()"
+              (input)="onPasswordChange($event)"
+              required>
+              
+            <button 
+              type="button" 
+              class="toggle-password" 
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+              <lucide-icon [img]="showPassword() ? eyeOff : eye"></lucide-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="options-row">
+          <label class="checkbox-container">
+            <input type="checkbox" [checked]="rememberMe()" (change)="onRememberMeChange($event)">
+            <span class="checkmark"></span>
+            Keep me logged in
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary" [disabled]="isLoading()">
+          @if (isLoading()) { Authentification... } @else { Sign in }
+        </button>
+
+        <div class="divider">
+          <span>OR</span>
+        </div>
+
+        <div class="social-login">
+          <button type="button" class="btn-outline">
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="20">
+            GitHub
+          </button>
+          <button type="button" class="btn-outline">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20">
+            Google
+          </button>
+        </div>
+
+        <!-- <p class="footer-text">
+          Don't have an account? <a href="#" >Sign up</a>
+        </p> -->
+      </form>
+    </div>
+  </div>
+</div>

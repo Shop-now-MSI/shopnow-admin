@@ -1,0 +1,122 @@
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.form-card {
+  background: #1a1c22; /* Même fond que les cartes Dashboard */
+  border: 1px solid #2d3139;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 700px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.form-header {
+  margin-bottom: 40px;
+}
+
+.form-header h2 {
+  font-size: 1.8rem;
+  color: #f0f6fc;
+  margin: 0 0 10px 0;
+}
+
+.form-header p {
+  color: #8b949e;
+  font-size: 0.95rem;
+}
+
+/* GRILLE DU FORMULAIRE */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  color: #8b949e;
+  font-weight: 500;
+}
+
+/* INPUTS ET SELECTS (Inspiration image 92c028 avec style Dark) */
+.form-group input, 
+.form-group select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #2d3139; /* Ligne sous l'input comme sur l'image 6 */
+  padding: 12px 0;
+  color: #f0f6fc;
+  font-size: 1.1rem;
+  outline: none;
+  transition: border-color 0.3s;
+  padding: 5px 10px;
+}
+
+.form-group input:focus, 
+.form-group select:focus {
+  border-bottom-color: #3b82f6; /* Accent bleu au focus */
+  background-color: #1f2228;
+
+}
+
+/* CONTENEUR SELECT POUR L'ICÔNE */
+.select-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-container select {
+  width: 100%;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select-icon {
+  position: absolute;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  color: #8b949e;
+  pointer-events: none;
+}
+
+/* BOUTON DE SOUMISSION */
+.form-footer {
+  margin-top: 50px;
+}
+
+.btn-submit {
+  background: transparent;
+  border: 1px solid #2d3139;
+  color: #f0f6fc;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  transform: translateX(5px);
+}
+
+.btn-submit lucide-icon {
+  width: 18px;
+  height: 18px;
+}
