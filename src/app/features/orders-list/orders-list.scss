@@ -223,6 +223,55 @@ h1 { font-size: 2rem; font-weight: 500; }
 .icon-btn:hover { color: var(--text-main); border-color: var(--text-muted); }
 .icon-btn.delete:hover { color: #ef4444; border-color: #ef4444; }
 
+/* --- STYLISATION DES BADGES PERSONNALISÉS --- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  position: relative;
+
+  // Le petit point lumineux à gauche
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  /* Statut: SUCCÈS (En service, Livré, Payé) */
+  &.service, &.delivered, &.paid {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    &::before { background: #10b981; box-shadow: 0 0 8px #10b981; }
+  }
+
+  /* Statut: ATTENTE / TRANSIT (En pause, En cours, En attente) */
+  &.pause, &.transit, &.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    &::before { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+  }
+
+  /* Statut: HORS LIGNE / ANNULÉ */
+  &.offline, &.cancelled {
+    background: rgba(107, 114, 128, 0.1);
+    color: #9ca3af;
+    &::before { background: #9ca3af; }
+  }
+
+  /* Statut: ERREUR / CRITIQUE (Optionnel) */
+  &.error, &.failed {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    &::before { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+  }
+}
+
 /* PAGINATION DARK */
 .pagination {
   display: flex;

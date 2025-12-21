@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   LayoutDashboard, 
-  ShoppingCart, 
+  Box, 
   Users, 
   Truck, 
   Settings, 
-  Plus,
+  Bell,
   LucideAngularModule,
 } from 'lucide-angular';
 
@@ -20,9 +20,9 @@ import {
 export class AdminLayoutComponent {
 
   layoutDashboard = LayoutDashboard;
-  readonly shoppingCart = ShoppingCart;
+  readonly box = Box;
   readonly users = Users;
   readonly truck = Truck
   readonly settings = Settings;
-  readonly plus = Plus;
+  readonly bell = Bell;
 }

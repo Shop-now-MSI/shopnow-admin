@@ -1,0 +1,121 @@
+<div class="page-container">
+  <header class="page-header">
+    <div class="header-left">
+      <div class="page-title-wrapper">
+        <button class="btn-back" routerLink="/admin/couriers-list">
+          <lucide-icon [img]="chevronLeft"></lucide-icon>
+        </button>
+        <h1>Profil du Livreur</h1>
+      </div>
+    </div>
+  </header>
+
+  <div class="content-layout">
+    <!-- Section Informations du Livreur -->
+    <section class="content-card-profile profile-card">
+      <div class="profile-header">
+        <img [src]="courier().avatar" alt="Avatar" class="courier-avatar">
+        <div class="profile-info">
+          <h2>{{ courier().firstName }} {{ courier().lastName }}</h2>
+          <span class="status-badge active">{{ courier().status }}</span>
+        </div>
+      </div>
+
+      <div class="info-grid-two-columns">
+        <div class="info-item">
+          <div class="info-label">
+            <label>Email</label>
+          </div>
+          <p>{{ courier().email }}</p>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">
+            <label>Téléphone</label>
+          </div>
+          <p>{{ courier().phone }}</p>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">
+            <label>Adresse</label>
+          </div>
+          <p>{{ courier().address }}</p>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">
+            <label>Type de Véhicule</label>
+          </div>
+          <p>{{ courier().vehicleType }}</p>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">
+            <label>Date d'embauche</label>
+          </div>
+          <p>{{ courier().registrationDate }}</p>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">
+            <label>ID Livreur</label>
+          </div>
+          <p>{{ courier().id }}</p>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-label">Total Livraisons</span>
+          <span class="stat-value">{{ courier().totalDeliveries }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Taux de Réussite</span>
+          <span class="stat-value">{{ courier().successRate }}%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Commandes Assignées -->
+    <section class="content-card orders-card">
+      <div class="card-header">
+        <h2>Commandes Assignées</h2>
+        <span class="orders-count">{{ totalOrders() }} commandes au total</span>
+      </div>
+
+      <div class="orders-grid">
+        @for (order of assignedOrders(); track order.id) {
+          <div class="order-card" (click)="navigateToOrderDetails(order.id)">
+            <div class="order-header">
+              <div class="order-id-status">
+                <span class="order-id">{{ order.id }}</span>
+                <span class="status-badge" [class]="order.statusClass">{{ order.status }}</span>
+              </div>
+              <span class="order-date">{{ order.date }}</span>
+            </div>
+
+            <div class="order-body">
+              <div class="order-info">
+                <lucide-icon [img]="packageIcon" class="icon-btn"></lucide-icon>
+                <span class="client-name">{{ order.client }}</span>
+              </div>
+              <div class="order-info">
+                <lucide-icon [img]="mapPin" class="icon-btn"></lucide-icon>
+                <span class="address-text">{{ order.address }}</span>
+              </div>
+              <div class="order-info">
+                <lucide-icon [img]="packageIcon" class="icon-btn"></lucide-icon>
+                <span>{{ order.items }} articles</span>
+              </div>
+            </div>
+
+            <div class="order-footer">
+              <span class="order-amount">{{ order.amount }}€</span>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+</div>

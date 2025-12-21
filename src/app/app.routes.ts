@@ -5,6 +5,9 @@ import { Dashboard } from './features/dashboard/dashboard';
 import { CouriersList } from './features/couriers-list/couriers-list';
 import { CourierForm } from './features/courier-form/courier-form';
 import { OrderAssignment} from './features/order-assignment/order-assignment';
+import { OrdersList } from './features/orders-list/orders-list';
+import { CoursierDetails } from './features/coursier-details/coursier-details';
+import { OrderTracking } from './features/order-tracking/order-tracking';
 
 export const routes: Routes = [
   {
@@ -19,6 +22,9 @@ export const routes: Routes = [
       { path: 'couriers-list', component: CouriersList },
       { path: 'courier-form', component: CourierForm },
       { path: 'order-assignment', component: OrderAssignment },
+      { path: 'orders-list', component: OrdersList },
+      { path: 'coursier-details', component: CoursierDetails },
+      { path: 'order-tracking', component: OrderTracking },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

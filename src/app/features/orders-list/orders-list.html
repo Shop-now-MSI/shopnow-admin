@@ -1,29 +1,30 @@
 <div class="page-container">
   <header class="page-header">
     <div class="header-left">
-      <h1>Gestion des Livreurs</h1>
-      <p>Gérez et suivez les performances de votre flotte de livraison</p>
+      <h1>Gestion des Commandes</h1>
+      <p>Suivez les expéditions et gérez les demandes clients</p>
     </div>
-    <div class="header-actions">
-      <button class="btn-primary" routerLink="/admin/courier-form">
+    <!-- <div class="header-actions">
+      <button class="btn-primary" routerLink="/admin/order-form">
         <lucide-icon [img]="plus"></lucide-icon>
-        Nouveau Livreur
+        Nouvelle Commande
       </button>
-    </div>
+    </div> -->
   </header>
 
   <section class="filters-bar">
     <div class="filters-group">
       <select class="select-filter">
         <option>Statut: Tous</option>
-        <option>En service</option>
-        <option>Hors ligne</option>
+        <option>En attente</option>
+        <option>En cours</option>
+        <option>Livré</option>
       </select>
       
       <select class="select-filter">
-        <option>Zone: Toutes</option>
-        <option>Paris</option>
-        <option>Lyon</option>
+        <option>Période: Ce mois</option>
+        <option>Cette semaine</option>
+        <option>Aujourd'hui</option>
       </select>
     </div>
     
@@ -49,47 +50,54 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>Livreur</th>
-            <th>Email</th>
-            <th>Téléphone</th>
-            <th>Zone</th>
-            <th>Livraisons</th>
-            <th>Note</th>
+            <th>ID Commande</th>
+            <th>Client</th>
+            <th>Destination</th>
+            <th>Date</th>
+            <th>Montant</th>
+            <th>Paiement</th>
             <th>Statut</th>
             <th class="text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
-          @for (courier of paginatedCouriers(); track courier.id) {
+          @for (order of paginatedOrders(); track order.id) {
             <tr class="table-row">
+              <td><span class="text-muted">#{{ order.trackingId }}</span></td>
+              
               <td>
                 <div class="user-cell">
-                  <img [src]="courier.avatar" alt="" class="user-avatar">
-                  <span class="user-name">{{ courier.name }}</span>
+                  <img [src]="order.clientAvatar" alt="" class="user-avatar">
+                  <span class="user-name">{{ order.clientName }}</span>
                 </div>
               </td>
-              <td class="text-muted">{{ courier.email }}</td>
-              <td class="text-muted">{{ courier.phone }}</td>
-              <td>{{ courier.zone }}</td>
-              <td><strong class="highlight">{{ courier.totalDeliveries }}</strong></td>
+              
+              <td>{{ order.destination }}</td>
+              
+              <td class="text-muted">{{ order.date }}</td>
+              
+              <td><strong class="highlight">{{ order.amount }} €</strong></td>
+              
               <td>
-                <span class="rating">
-                  <lucide-icon [img]="star" class="star-icon"></lucide-icon>
-                  {{ courier.rating }}
+                <span class="status-badge" [class]="order.paymentStatus">
+                  {{ order.paymentStatus === 'paid' ? 'Payé' : 'En attente' }}
                 </span>
               </td>
+
               <td>
-                <span class="status-badge" [class]="courier.status">
-                  @switch (courier.status) {
-                    @case ('service') { En service }
-                    @case ('offline') { Hors ligne }
-                    @case ('pause') { En pause }
+                <span class="status-badge" [class]="order.status">
+                  @switch (order.status) {
+                    @case ('pending') { En attente }
+                    @case ('transit') { En transit }
+                    @case ('delivered') { Livré }
+                    @case ('cancelled') { Annulé }
                   }
                 </span>
               </td>
+
               <td class="text-right">
                 <div class="actions">
-                  <button class="icon-btn" title="Voir détails" routerLink="/admin/coursier-details">
+                  <button class="icon-btn" title="Voir détails" routerLink="/admin/order-assignment">
                     <lucide-icon [img]="eye"></lucide-icon>
                   </button>
                   <button class="icon-btn edit" title="Modifier">
@@ -102,7 +110,7 @@
               </td>
             </tr>
           } @empty {
-             <tr><td colspan="8" style="text-align:center; padding: 20px;">Aucun livreur trouvé</td></tr>
+             <tr><td colspan="8" style="text-align:center; padding: 20px;">Aucune commande trouvée</td></tr>
           }
         </tbody>
       </table>
@@ -112,10 +120,7 @@
   <footer class="pagination">
     <span class="page-info">{{ paginationInfo() }}</span>
     <div class="page-controls">
-      
-      <button class="page-btn" 
-              [disabled]="currentPage() === 1" 
-              (click)="prevPage()">
+      <button class="page-btn" [disabled]="currentPage() === 1" (click)="prevPage()">
         <lucide-icon [img]="chevronLeft"></lucide-icon>
       </button>
 
@@ -127,11 +132,9 @@
         </button>
       }
 
-      <button class="page-btn" 
-              [disabled]="currentPage() === totalPages()" 
-              (click)="nextPage()">
+      <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
         <lucide-icon [img]="chevronRight"></lucide-icon>
       </button>
     </div>
   </footer>
-</div>
+</div>  

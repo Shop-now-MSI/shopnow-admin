@@ -1,141 +1,121 @@
-<!-- ========================================== -->
-<!-- ORDER ASSIGNMENT HTML - HARMONISÉ -->
-<!-- ========================================== -->
-
-<div class="assignment-page">
-  <!-- HEADER -->
+<div class="page-container">
   <header class="page-header">
     <div class="header-left">
-      <button class="btn-back" title="Retour">
-        <lucide-icon [img]="arrowLeft"></lucide-icon>
-      </button>
-      <div class="header-info">
-        <h1 class="order-id">#56784567</h1>
-        <span class="update-date">Mis à jour le: 16/12/2024, 15:32</span>
+      <div class="order-id-wrapper">
+        <button class="btn-back" routerLink="/admin/orders-list">
+          <lucide-icon [img]="chevronLeft"></lucide-icon>
+        </button>
+        <h1>#{{ order().id }}</h1>
       </div>
     </div>
   </header>
 
-  <!-- CONTENU PRINCIPAL -->
-  <div class="assignment-layout">
-    <!-- COLONNE GAUCHE -->
-    <div class="main-column">
-      <!-- INFORMATIONS CLIENT -->
-      <section class="card">
+  <div class="assignment-grid">
+    <div class="main-section">
+      <section class="content-card">
         <div class="card-header">
           <h2>Informations Client</h2>
-          <img 
-            src="https://i.pravatar.cc/150?u=client" 
-            alt="Client Avatar" 
-            class="client-avatar">
+          <img [src]="order().clientAvatar" alt="" class="client-avatar-large">
         </div>
         
         <div class="info-grid">
           <div class="info-item">
-            <span class="label">Ville</span>
-            <span class="value">Paris, France</span>
+            <label>Ville / Destination</label>
+            <p>{{ order().town }}</p>
           </div>
           <div class="info-item">
-            <span class="label">Âge</span>
-            <span class="value">28 ans</span>
+            <label>Âge</label>
+            <p>{{ order().age }} ans</p>
           </div>
           <div class="info-item">
-            <span class="label">Poids Total</span>
-            <span class="value">12.5 KG</span>
+            <label>Poids Total</label>
+            <p>{{ order().totalWeight }} KG</p>
           </div>
           <div class="info-item">
-            <span class="label">Profession</span>
-            <span class="value">Ingénieur</span>
+            <label>Volume</label>
+            <p>{{ order().volume }} M³</p>
           </div>
           <div class="info-item">
-            <span class="label">Date de Naissance</span>
-            <span class="value">12.05.1996</span>
+            <label>Date de Naissance</label>
+            <p>{{ order().dob }}</p>
           </div>
           <div class="info-item">
-            <span class="label">Type de Service</span>
-            <span class="value">Livraison Express</span>
+            <label>Type de Service</label>
+            <p class="badge-text">{{ order().serviceType }}</p>
           </div>
         </div>
       </section>
 
-      <!-- FORMULAIRE D'ASSIGNATION -->
-      <section class="card">
-        <h2>Assignation du Livreur</h2>
-        
-        <form class="assignment-form">
-          <div class="form-group">
-            <label>Choisir un Livreur</label>
-            <div class="input-with-icon">
-              <lucide-icon [img]="user" class="input-icon"></lucide-icon>
-              <select class="form-select">
-                <option value="" disabled selected>Sélectionner un livreur disponible</option>
-                <option value="1">Jean Marc Alain (Paris 08)</option>
-                <option value="2">Elliot Møller (Paris 15)</option>
-              </select>
-              <lucide-icon [img]="chevronDown" class="arrow-icon"></lucide-icon>
-            </div>
+      <section class="content-card assignment-card">
+        <h2>Assignation du coursier</h2>
+        <div class="form-assign">
+          <div class="form-group-livreur">
+            <label for="livreur">Coursier</label>
+            <select class="select-filter" [value]="selectedCourierId()" (change)="onCourierChange($event)" id="livreur">
+              <option value="">Sélectionner un livreur...</option>
+              @for (courier of availableCouriers(); track courier.id) {
+                <option [value]="courier.id">{{ courier.name }} ({{ courier.zone }})</option>
+              }
+            </select>
           </div>
 
           <div class="form-group">
-            <label>Description / Note interne</label>
-            <textarea 
-              class="form-textarea"
-              placeholder="Ajoutez des instructions spécifiques pour le livreur..."></textarea>
+            <label>Description / Instructions</label>
+            <textarea id="description"
+              class="custom-textarea" 
+              placeholder="Ajouter des notes particulières pour cette livraison..."
+              [(ngModel)]="description"
+            ></textarea>
           </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn-accept">
-              Accepter & Assigner
-              <lucide-icon [img]="arrowRight"></lucide-icon>
-            </button>
-            <button type="button" class="btn-reject">
-              Rejeter
-            </button>
-          </div>
-        </form>
+        </div>
       </section>
+      <div class="action-footer">
+          <button class="btn-primary" (click)="acceptAssignment()">
+            Assigner
+          </button>
+          <button class="btn-reject" (click)="rejectAssignment()">
+            Annuler
+          </button>
+        </div>
     </div>
 
-    <!-- COLONNE DROITE - RÉCAPITULATIF -->
-    <aside class="sidebar-column">
-      <section class="card">
-        <h2>Récapitulatif Commande</h2>
+    <aside class="sidebar-section">
+      <div class="content-card financial-card">
+        <h2>Résumé Financier</h2>
         
-        <div class="summary-list">
-          <div class="summary-item main">
-            <span>Produits</span>
-            <span class="value">Electronique</span>
-          </div>
-          
-          <div class="divider"></div>
-          
-          <div class="summary-item">
-            <span>Laptop Pro 16"</span>
-            <span class="value">1,200.00</span>
-          </div>
-          <div class="summary-item">
-            <span>Souris Sans Fil</span>
-            <span class="value">45.50</span>
-          </div>
-          <div class="summary-item">
-            <span>TVA (20%)</span>
-            <span class="value">249.10</span>
-          </div>
-          <div class="summary-item discount">
-            <span>Réduction (PROMO25)</span>
-            <span class="value">-50.00</span>
-          </div>
-          <div class="summary-item">
-            <span>Frais de port</span>
-            <span class="value">15.00</span>
+        <div class="financial-group">
+          <h3 class="group-title">Enlèvement (Pickup)</h3>
+          <div class="price-row">
+            <span>Transport (Trucking)</span>
+            <span class="amount">{{ order().prices.trucking | number:'1.2-2' }}</span>
           </div>
         </div>
 
-        <div class="total-section">
-          <span class="total-label">Total</span>
-          <span class="total-amount">1,459.60 USD</span>
+        <div class="financial-group border-top">
+          <h3 class="group-title">Origine</h3>
+          <div class="price-row">
+            <span>Assurance B/L</span>
+            <span class="amount">{{ order().prices.insurance | number:'1.2-2' }}</span>
+          </div>
+          <div class="price-row">
+            <span>Surcharge Carburant</span>
+            <span class="amount">{{ order().prices.fuelSurcharge | number:'1.2-2' }}</span>
+          </div>
+          <div class="price-row">
+            <span>Frais d'entrepôt CFS</span>
+            <span class="amount">{{ order().prices.warehouse | number:'1.2-2' }}</span>
+          </div>
+          <div class="price-row">
+            <span>Frais Chassis</span>
+            <span class="amount">{{ order().prices.chassis | number:'1.2-2' }}</span>
+          </div>
         </div>
-      </section>
+
+        <div class="total-row">
+          <span>Total</span>
+          <span class="total-amount">USD {{ calculateTotal() | number:'1.2-2' }}</span>
+        </div>
+      </div>
     </aside>
   </div>
 </div>

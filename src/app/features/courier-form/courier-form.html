@@ -1,63 +1,127 @@
-<div class="form-wrapper">
-  <div class="form-card">
-    <header class="form-header">
-      <h2>Informations du Livreur</h2>
-      <p>Veuillez saisir les informations telles qu'elles figurent sur la pièce d'identité.</p>
-    </header>
+<div class="page-container">
+  <header class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/admin/couriers-list">
+        <lucide-icon [img]="chevronLeft"></lucide-icon>
+      </button>
+      <div>
+        <h1>Enregistrement Livreur</h1>
+        <p>Veuillez remplir toutes les informations requises pour enregistrer un nouveau membre de la flotte.</p>
+      </div>     
+    </div>
+  </header>
 
-    <form class="registration-form">
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="firstName">Prénom</label>
-          <input type="text" id="firstName" placeholder="ex: Alexander">
+  <div class="form-container">
+    
+    <section class="content-card photo-section">
+      <h3>Photo de Profil</h3>
+      <div class="photo-uploader">
+        <div class="avatar-preview">
+          @if (previewUrl()) {
+            <img [src]="previewUrl()" alt="Aperçu">
+          } @else {
+            <lucide-icon [img]="user" class="placeholder-icon"></lucide-icon>
+          }
         </div>
-
-        <div class="form-group">
-          <label for="lastName">Nom de famille</label>
-          <input type="text" id="lastName" placeholder="ex: Smith">
+        <div class="upload-controls">
+          <button class="btn-upload" (click)="fileInput.click()">
+            <lucide-icon [img]="upload"></lucide-icon>
+            Télécharger Photo
+          </button>
+          <span class="help-text">JPG, PNG jusqu'à 5MB</span>
+          <input #fileInput type="file" hidden (change)="onFileSelected($event)" accept="image/*">
         </div>
+      </div>
+    </section>
 
+    <section class="content-card">
+      <h3>Informations Personnelles</h3>
+      
+      <div class="form-grid two-cols">
         <div class="form-group">
-          <label for="email">Adresse Email</label>
-          <input type="email" id="email" placeholder="alexander.smith@example.com">
+          <label>Prénom <span class="required">*</span></label>
+          <input type="text" placeholder="Entrer le prénom" [(ngModel)]="courier().firstName">
         </div>
-
         <div class="form-group">
-          <label for="phone">Numéro de Téléphone</label>
-          <input type="tel" id="phone" placeholder="+33 6 00 00 00 00">
-        </div>
-
-        <div class="form-group">
-          <label for="zone">Zone d'affectation</label>
-          <div class="select-container">
-            <select id="zone">
-              <option value="" disabled selected>Choisir une zone</option>
-              <option value="paris_08">Paris 08</option>
-              <option value="lyon_centre">Lyon Centre</option>
-              <option value="marseille_nord">Marseille Nord</option>
-            </select>
-            <lucide-icon [img]="chevronDown" class="select-icon"></lucide-icon>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="status">Statut initial</label>
-          <div class="select-container">
-            <select id="status">
-              <option value="service">En service</option>
-              <option value="offline">Hors ligne</option>
-            </select>
-            <lucide-icon [img]="chevronDown" class="select-icon"></lucide-icon>
-          </div>
+          <label>Nom <span class="required">*</span></label>
+          <input type="text" placeholder="Entrer le nom" [(ngModel)]="courier().lastName">
         </div>
       </div>
 
-      <div class="form-footer">
-        <button type="submit" class="btn-submit">
-          Enregistrer le Livreur
-          <lucide-icon [img]="arrowRight"></lucide-icon>
-        </button>
+      <div class="form-grid two-cols">
+        <div class="form-group">
+          <label>Adresse Email <span class="required">*</span></label>
+          <input type="email" placeholder="Entrer l'email" [(ngModel)]="courier().email">
+        </div>
+        <div class="form-group">
+          <label>Numéro de Téléphone <span class="required">*</span></label>
+          <input type="tel" placeholder="Entrer le numéro" [(ngModel)]="courier().phone">
+        </div>
       </div>
-    </form>
+
+      <div class="form-grid full-width">
+        <div class="form-group">
+          <label>Date de Naissance <span class="required">*</span></label>
+          <div class="input-with-icon">
+            <input type="date" [(ngModel)]="courier().dob">
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-card">
+      <h3>Détails de la mission</h3>
+
+      <div class="form-grid two-cols">
+        <div class="form-group">
+          <label>Type de Véhicule <span class="required">*</span></label>
+          <select [(ngModel)]="courier().vehicleType">
+            <option value="" disabled selected>Sélectionner le véhicule</option>
+            <option value="scooter_50">Scooter 50cc</option>
+            <option value="scooter_125">Scooter 125cc</option>
+            <option value="bike_elec">Vélo Électrique</option>
+            <option value="bike_cargo">Vélo Cargo</option>
+            <option value="car">Voiture</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Zone d'activité <span class="required">*</span></label>
+          <select [(ngModel)]="courier().zone">
+            <option value="" disabled selected>Sélectionner la zone</option>
+            <option value="paris_center">Paris Centre</option>
+            <option value="paris_north">Paris Nord</option>
+            <option value="lyon">Lyon</option>
+            <option value="marseille">Marseille</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid three-cols">
+        <div class="form-group">
+          <label>Date de début <span class="required">*</span></label>
+          <input type="date" [(ngModel)]="courier().startDate">
+        </div>
+        
+        <div class="form-group">
+          <label>Type de Contrat <span class="required">*</span></label>
+          <select [(ngModel)]="courier().contractType">
+            <option value="" disabled selected>Sélectionner</option>
+            <option value="full_time">Temps Plein</option>
+            <option value="part_time">Temps Partiel</option>
+            <option value="freelance">Freelance</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Immatriculation / ID <span class="required">*</span></label>
+          <input type="text" placeholder="ex: AA-123-BB" [(ngModel)]="courier().licensePlate">
+        </div>
+      </div>
+    </section>
+    <div class="form-actions">
+      <button class="btn-primary" (click)="saveCourier()">Enregistrer</button>
+      <button class="btn-secondary" routerLink="/admin/couriers">Annuler</button>
+    </div>
+
   </div>
 </div>
