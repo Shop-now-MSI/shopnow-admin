@@ -12,14 +12,11 @@ export class Dashboard {
   slidersHorizontal = SlidersHorizontal;
   moreVertical = EllipsisVertical;
 
-  constructor(
-    private api: ApiService
-  ){}
+  constructor(private api: ApiService) {}
 
-  ngOnInit() : void{
-  }
+  ngOnInit(): void {}
 
-  // Données mockées pour le visuel
+  // ✅ AJOUTE "trend" à chaque courier
   couriers = [
     { 
       name: 'Elliot Møller', 
@@ -28,7 +25,8 @@ export class Dashboard {
       level: 15, 
       deliveryCount: 4723, 
       progress: 75,
-      color: '#10b981'
+      color: '#10b981',
+      trend: '+12%'  // ← AJOUTE CETTE LIGNE
     },
     { 
       name: 'Olivia Pedersen', 
@@ -37,7 +35,8 @@ export class Dashboard {
       level: 11, 
       deliveryCount: 2339, 
       progress: 40,
-      color: '#3b82f6'
+      color: '#3b82f6',
+      trend: '+8%'  // ← AJOUTE CETTE LIGNE
     },
     { 
       name: 'Niklas Döring', 
@@ -46,8 +45,8 @@ export class Dashboard {
       level: 6, 
       deliveryCount: 1884, 
       progress: 25,
-      color: '#a855f7'
+      color: '#a855f7',
+      trend: '+5%'  // ← AJOUTE CETTE LIGNE
     }
   ];
-
 }
