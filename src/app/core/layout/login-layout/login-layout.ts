@@ -1,13 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Mail, Users, CircleCheck,  LogIn, Truck, MapPin, ShieldCheck, Loader, EyeOff, Eye, Key, Lock, User,  CircleAlert,  LucideAngularModule } from 'lucide-angular';
-
+import { Mail, Users, CircleCheck, LogIn, Truck, MapPin, ShieldCheck, Loader, EyeOff, Eye, Key, Lock, User, CircleAlert, LucideAngularModule } from 'lucide-angular';
+import { AuthService } from '../../../services/auth.service'; // Assure-toi que le chemin est correct vers auth.service.ts
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule ],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './login-layout.html',
   styleUrls: ['./login-layout.scss']
 })
@@ -18,7 +18,6 @@ export class LoginComponent {
   isLoading = signal(false);
   showPassword = signal(false);
   errorMessage = signal('');
-
   mail = Mail;
   users = Users;
   circleCheck = CircleCheck;
@@ -36,7 +35,7 @@ export class LoginComponent {
   mapPin = MapPin;
   shieldCheck = ShieldCheck;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   onEmailChange(event: Event): void {
     this.email.set((event.target as HTMLInputElement).value);
@@ -54,9 +53,9 @@ export class LoginComponent {
     this.showPassword.set(!this.showPassword());
   }
 
-  async onSubmit(event: Event): Promise<void> {
+  onSubmit(event: Event): void {
     event.preventDefault();
-    
+
     if (!this.email() || !this.password()) {
       this.errorMessage.set('Veuillez remplir tous les champs');
       return;
@@ -65,25 +64,22 @@ export class LoginComponent {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    try {
-      await this.login(this.email(), this.password());
-      this.router.navigate(['/admin/dashboard']);
-    } catch (error) {
-      this.errorMessage.set('Email ou mot de passe incorrect');
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  private login(email: string, password: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (email && password.length >= 6) {
-          resolve();
-        } else {
-          reject(new Error('Invalid credentials'));
-        }
-      }, 4000);
+    this.authService.login(this.email(), this.password()).subscribe({
+      next: () => {
+        this.router.navigate(['/admin/dashboard']);
+      },
+      error: (error) => {
+        console.error('Login error:', error);
+        this.errorMessage.set('Email ou mot de passe incorrect');
+        setTimeout(() => {
+           this.isLoading.set(false);
+        }, 4000);
+        alert(error)
+      },
+      
+      complete: () => {
+        this.isLoading.set(false);
+      }
     });
   }
 

@@ -4,12 +4,6 @@
       <h1>Gestion des Commandes</h1>
       <p>Suivez les expéditions et gérez les demandes clients</p>
     </div>
-    <!-- <div class="header-actions">
-      <button class="btn-primary" routerLink="/admin/order-form">
-        <lucide-icon [img]="plus"></lucide-icon>
-        Nouvelle Commande
-      </button>
-    </div> -->
   </header>
 
   <section class="filters-bar">
@@ -20,14 +14,14 @@
         <option>En cours</option>
         <option>Livré</option>
       </select>
-      
+
       <select class="select-filter">
         <option>Période: Ce mois</option>
         <option>Cette semaine</option>
         <option>Aujourd'hui</option>
       </select>
     </div>
-    
+
     <button class="btn-clear">
       <lucide-icon [img]="trash"></lucide-icon>
       Effacer tout
@@ -52,32 +46,38 @@
           <tr>
             <th>ID Commande</th>
             <th>Client</th>
-            <th>Destination</th>
+            <th>Adresse</th>
+            <th>Ville</th>
             <th>Date</th>
             <th>Montant</th>
             <th>Paiement</th>
             <th>Statut</th>
-            <th class="text-right">Actions</th>
+            <th>Notes</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           @for (order of paginatedOrders(); track order.id) {
-            <tr class="table-row">
+            <tr class="table-row" >
               <td><span class="text-muted">#{{ order.trackingId }}</span></td>
-              
+
               <td>
                 <div class="user-cell">
                   <img [src]="order.clientAvatar" alt="" class="user-avatar">
-                  <span class="user-name">{{ order.clientName }}</span>
+                  <div>
+                    <span class="user-name">{{ order.clientName }}</span>
+                    <span class="user-email">{{ order.clientEmail }}</span>
+                  </div>
                 </div>
               </td>
-              
-              <td>{{ order.destination }}</td>
-              
+
+              <td>{{ order.deliveryAddress }}</td>
+              <td>{{ order.city }}</td>
+
               <td class="text-muted">{{ order.date }}</td>
-              
+
               <td><strong class="highlight">{{ order.amount }} €</strong></td>
-              
+
               <td>
                 <span class="status-badge" [class]="order.paymentStatus">
                   {{ order.paymentStatus === 'paid' ? 'Payé' : 'En attente' }}
@@ -95,22 +95,19 @@
                 </span>
               </td>
 
-              <td class="text-right">
-                <div class="actions">
-                  <button class="icon-btn" title="Voir détails" routerLink="/admin/order-assignment">
-                    <lucide-icon [img]="eye"></lucide-icon>
-                  </button>
-                  <button class="icon-btn edit" title="Modifier">
-                    <lucide-icon [img]="pencil"></lucide-icon>
-                  </button>
-                  <button class="icon-btn delete" title="Supprimer">
-                    <lucide-icon [img]="trash2"></lucide-icon>
-                  </button>
-                </div>
+              <td>{{ order.notes }}</td>
+              <td>
+                <button class="icon-btn" title="Details" routerLink="/admin/order-assignment/{{ order.id }}">
+                  <lucide-icon [img]="eye"></lucide-icon>
+                </button>
+                <br>
+                <button class="icon-btn" title="Suivre" routerLink="/admin/order-tracking">
+                  <lucide-icon [img]="ArrowBigRightDash"></lucide-icon>
+                </button>
               </td>
             </tr>
           } @empty {
-             <tr><td colspan="8" style="text-align:center; padding: 20px;">Aucune commande trouvée</td></tr>
+            <tr><td colspan="9" style="text-align:center; padding: 20px;">Aucune commande trouvée</td></tr>
           }
         </tbody>
       </table>
@@ -125,7 +122,7 @@
       </button>
 
       @for (page of pagesArray(); track page) {
-        <button class="page-btn" 
+        <button class="page-btn"
                 [class.active]="currentPage() === page"
                 (click)="goToPage(page)">
           {{ page }}
@@ -137,4 +134,4 @@
       </button>
     </div>
   </footer>
-</div>  
+</div>

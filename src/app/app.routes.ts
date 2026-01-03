@@ -8,6 +8,8 @@ import { OrderAssignment} from './features/order-assignment/order-assignment';
 import { OrdersList } from './features/orders-list/orders-list';
 import { CoursierDetails } from './features/coursier-details/coursier-details';
 import { OrderTracking } from './features/order-tracking/order-tracking';
+// app.routes.ts
+import { authGuard } from '../app/services/auth.guard';
 
 export const routes: Routes = [
   {
@@ -17,11 +19,14 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminLayoutComponent,
+    canActivate: [authGuard],
     children: [
       { path: 'dashboard', component: Dashboard },
       { path: 'couriers-list', component: CouriersList },
       { path: 'courier-form', component: CourierForm },
-      { path: 'order-assignment', component: OrderAssignment },
+      { path: 'coursier-details/:id', component: CoursierDetails },
+      { path: 'courier-form/:id', component: CourierForm },
+      { path: 'order-assignment/:id', component: OrderAssignment },
       { path: 'orders-list', component: OrdersList },
       { path: 'coursier-details', component: CoursierDetails },
       { path: 'order-tracking', component: OrderTracking },

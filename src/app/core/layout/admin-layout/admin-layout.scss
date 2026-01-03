@@ -143,3 +143,83 @@
   justify-content: center;
   color: var(--text-gray);
 }
+
+/* Ajoutez ces styles à votre fichier admin-layout.scss */
+.profile-section {
+  position: relative;
+  cursor: pointer;
+}
+
+.profile-popup {
+  position: absolute;
+  bottom: 60px;
+  left: 170px;
+  transform: translateX(-50%);
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 0;
+  width: 200px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  color: var(--text-gray);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 5px 0;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  background: none;
+  border: none;
+  color: var(--text-gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.user-icon, .logout-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Ajoutez ces styles à votre fichier admin-layout.scss */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+  background: transparent;
+}
+
+/* ... (autres styles existants) */

@@ -11,7 +11,6 @@
       </button>
     </div>
   </header>
-
   <section class="filters-bar">
     <div class="filters-group">
       <select class="select-filter">
@@ -19,20 +18,19 @@
         <option>En service</option>
         <option>Hors ligne</option>
       </select>
-      
+     
       <select class="select-filter">
         <option>Zone: Toutes</option>
         <option>Paris</option>
         <option>Lyon</option>
       </select>
     </div>
-    
+   
     <button class="btn-clear">
       <lucide-icon [img]="trash"></lucide-icon>
       Effacer tout
     </button>
   </section>
-
   <div class="table-wrapper">
     @if (canScrollLeft()) {
       <button class="scroll-btn left" (click)="scrollTable(-200)">
@@ -44,7 +42,6 @@
         <lucide-icon [img]="chevronRight"></lucide-icon>
       </button>
     }
-
     <div class="table-container" #tableContainer (scroll)="onScroll()">
       <table class="data-table">
         <thead>
@@ -82,20 +79,20 @@
                 <span class="status-badge" [class]="courier.status">
                   @switch (courier.status) {
                     @case ('service') { En service }
-                    @case ('offline') { Hors ligne }
+                    @case ('disponible') { Disponible }
                     @case ('pause') { En pause }
                   }
                 </span>
               </td>
               <td class="text-right">
                 <div class="actions">
-                  <button class="icon-btn" title="Voir détails" routerLink="/admin/coursier-details">
+                  <button class="icon-btn" title="Voir détails" [routerLink]="['/admin/coursier-details', courier.id]">
                     <lucide-icon [img]="eye"></lucide-icon>
                   </button>
-                  <button class="icon-btn edit" title="Modifier">
+                  <button class="icon-btn edit" title="Modifier" [routerLink]="['/admin/courier-form', courier.id]">
                     <lucide-icon [img]="pencil"></lucide-icon>
                   </button>
-                  <button class="icon-btn delete" title="Supprimer">
+                  <button class="icon-btn delete" title="Supprimer" (click)="deleteCourier(courier.id)">
                     <lucide-icon [img]="trash2"></lucide-icon>
                   </button>
                 </div>
@@ -108,27 +105,24 @@
       </table>
     </div>
   </div>
-
   <footer class="pagination">
     <span class="page-info">{{ paginationInfo() }}</span>
     <div class="page-controls">
-      
-      <button class="page-btn" 
-              [disabled]="currentPage() === 1" 
+     
+      <button class="page-btn"
+              [disabled]="currentPage() === 1"
               (click)="prevPage()">
         <lucide-icon [img]="chevronLeft"></lucide-icon>
       </button>
-
       @for (page of pagesArray(); track page) {
-        <button class="page-btn" 
+        <button class="page-btn"
                 [class.active]="currentPage() === page"
                 (click)="goToPage(page)">
           {{ page }}
         </button>
       }
-
-      <button class="page-btn" 
-              [disabled]="currentPage() === totalPages()" 
+      <button class="page-btn"
+              [disabled]="currentPage() === totalPages()"
               (click)="nextPage()">
         <lucide-icon [img]="chevronRight"></lucide-icon>
       </button>

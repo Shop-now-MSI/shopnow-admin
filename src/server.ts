@@ -6,7 +6,10 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+// server.ts (Angular Universal)
+import 'localstorage-polyfill';
 
+global['localStorage'] = localStorage;
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();

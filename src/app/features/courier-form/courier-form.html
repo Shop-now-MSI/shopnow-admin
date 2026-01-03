@@ -5,14 +5,18 @@
         <lucide-icon [img]="chevronLeft"></lucide-icon>
       </button>
       <div>
-        <h1>Enregistrement Livreur</h1>
-        <p>Veuillez remplir toutes les informations requises pour enregistrer un nouveau membre de la flotte.</p>
-      </div>     
+        @if(edit()){  
+          <h1>Modification Livreur</h1>
+          <p>Veuillez remplir toutes les informations requises pour modifier un membre de la flotte.</p>
+        }@else {
+          <h1>Enregistrement Livreur</h1>
+          <p>Veuillez remplir toutes les informations requises pour enregistrer un nouveau membre de la flotte.</p>
+        }
+      </div>    
     </div>
   </header>
-
   <div class="form-container">
-    
+   
     <section class="content-card photo-section">
       <h3>Photo de Profil</h3>
       <div class="photo-uploader">
@@ -33,10 +37,9 @@
         </div>
       </div>
     </section>
-
     <section class="content-card">
       <h3>Informations Personnelles</h3>
-      
+     
       <div class="form-grid two-cols">
         <div class="form-group">
           <label>Prénom <span class="required">*</span></label>
@@ -47,7 +50,6 @@
           <input type="text" placeholder="Entrer le nom" [(ngModel)]="courier().lastName">
         </div>
       </div>
-
       <div class="form-grid two-cols">
         <div class="form-group">
           <label>Adresse Email <span class="required">*</span></label>
@@ -58,8 +60,11 @@
           <input type="tel" placeholder="Entrer le numéro" [(ngModel)]="courier().phone">
         </div>
       </div>
-
-      <div class="form-grid full-width">
+      <div class="form-grid two-cols">
+        <div class="form-group">
+          <label>Mot de passe <span class="required">*</span> (requis pour création)</label>
+          <input type="password" placeholder="Entrer le mot de passe" [(ngModel)]="courier().password">
+        </div>
         <div class="form-group">
           <label>Date de Naissance <span class="required">*</span></label>
           <div class="input-with-icon">
@@ -68,10 +73,8 @@
         </div>
       </div>
     </section>
-
     <section class="content-card">
       <h3>Détails de la mission</h3>
-
       <div class="form-grid two-cols">
         <div class="form-group">
           <label>Type de Véhicule <span class="required">*</span></label>
@@ -95,33 +98,33 @@
           </select>
         </div>
       </div>
-
       <div class="form-grid three-cols">
         <div class="form-group">
           <label>Date de début <span class="required">*</span></label>
           <input type="date" [(ngModel)]="courier().startDate">
         </div>
-        
+       
         <div class="form-group">
           <label>Type de Contrat <span class="required">*</span></label>
           <select [(ngModel)]="courier().contractType">
             <option value="" disabled selected>Sélectionner</option>
-            <option value="full_time">Temps Plein</option>
-            <option value="part_time">Temps Partiel</option>
+            <option value="temps plein">Temps Plein</option>
+            <option value="temps partiel">Temps Partiel</option>
             <option value="freelance">Freelance</option>
           </select>
         </div>
-
         <div class="form-group">
           <label>Immatriculation / ID <span class="required">*</span></label>
           <input type="text" placeholder="ex: AA-123-BB" [(ngModel)]="courier().licensePlate">
         </div>
       </div>
     </section>
+    @if (errorMessage()) {
+      <div class="error-message">{{ errorMessage() }}</div>
+    }
     <div class="form-actions">
-      <button class="btn-primary" (click)="saveCourier()">Enregistrer</button>
-      <button class="btn-secondary" routerLink="/admin/couriers">Annuler</button>
+      <button class="btn-primary" (click)="saveCourier()" [disabled]="isLoading()">{{ isLoading() ? 'Enregistrement...' : 'Enregistrer' }}</button>
+      <button class="btn-secondary" routerLink="/admin/couriers-list">Annuler</button>
     </div>
-
   </div>
 </div>

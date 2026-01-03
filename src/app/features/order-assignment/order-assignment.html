@@ -5,71 +5,86 @@
         <button class="btn-back" routerLink="/admin/orders-list">
           <lucide-icon [img]="chevronLeft"></lucide-icon>
         </button>
-        <h1>#{{ order().id }}</h1>
+        <h1>#{{ order()?.zip }}</h1>
       </div>
     </div>
   </header>
 
-  <div class="assignment-grid">
-    <div class="main-section">
-      <section class="content-card">
-        <div class="card-header">
-          <h2>Informations Client</h2>
-          <img [src]="order().clientAvatar" alt="" class="client-avatar-large">
-        </div>
-        
-        <div class="info-grid">
-          <div class="info-item">
-            <label>Ville / Destination</label>
-            <p>{{ order().town }}</p>
-          </div>
-          <div class="info-item">
-            <label>Âge</label>
-            <p>{{ order().age }} ans</p>
-          </div>
-          <div class="info-item">
-            <label>Poids Total</label>
-            <p>{{ order().totalWeight }} KG</p>
-          </div>
-          <div class="info-item">
-            <label>Volume</label>
-            <p>{{ order().volume }} M³</p>
-          </div>
-          <div class="info-item">
-            <label>Date de Naissance</label>
-            <p>{{ order().dob }}</p>
-          </div>
-          <div class="info-item">
-            <label>Type de Service</label>
-            <p class="badge-text">{{ order().serviceType }}</p>
-          </div>
-        </div>
-      </section>
+  @if (isLoading()) {
+    <div class="loading">Chargement en cours...</div>
+  }
 
-      <section class="content-card assignment-card">
-        <h2>Assignation du coursier</h2>
-        <div class="form-assign">
-          <div class="form-group-livreur">
-            <label for="livreur">Coursier</label>
-            <select class="select-filter" [value]="selectedCourierId()" (change)="onCourierChange($event)" id="livreur">
-              <option value="">Sélectionner un livreur...</option>
-              @for (courier of availableCouriers(); track courier.id) {
-                <option [value]="courier.id">{{ courier.name }} ({{ courier.zone }})</option>
-              }
-            </select>
+  @if (error()) {
+    <div class="error-message">{{ error() }}</div>
+  }
+
+  @if (order()) {
+    <div class="assignment-grid">
+      <div class="main-section">
+        <section class="content-card">
+          <div class="card-header">
+            <h2>Informations Client</h2>
+            <img [src]="order().clientAvatar" alt="" class="client-avatar-large">
           </div>
 
-          <div class="form-group">
-            <label>Description / Instructions</label>
-            <textarea id="description"
-              class="custom-textarea" 
-              placeholder="Ajouter des notes particulières pour cette livraison..."
-              [(ngModel)]="description"
-            ></textarea>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Nom</label>
+              <p>{{ order().clientName }}</p>
+            </div>
+            <div class="info-item">
+              <label>Email</label>
+              <p>{{ order().clientEmail }}</p>
+            </div>
+            <div class="info-item">
+              <label>Adresse</label>
+              <p>{{ order().deliveryAddress }}</p>
+            </div>
+            <div class="info-item">
+              <label>Date</label>
+              <p>{{ order().date }}</p>
+            </div>
+            <div class="info-item">
+              <label>Statut</label>
+              <p class="badge-text">{{ order().deliveryStatus }}</p>
+            </div>
           </div>
-        </div>
-      </section>
-      <div class="action-footer">
+        </section>
+
+        <section class="content-card assignment-card">
+          <h2>Produits</h2>
+          <div class="products-list">
+            @for (product of order().products; track product.name) {
+              <div class="product-item">
+                <span>{{ product.name }} ({{ product.brand }})</span>
+                <span>{{ product.quantity }} x {{ product.price | number:'1.2-2' }} €</span>
+              </div>
+            }
+          </div>
+
+          <div class="form-assign">
+            <div class="form-group-livreur">
+              <label for="livreur">Coursier</label>
+              <select class="select-filter" [value]="selectedCourierId()" (change)="onCourierChange($event)" id="livreur">
+                <option value="">Sélectionner un livreur...</option>
+                @for (courier of availableCouriers(); track courier.matricule) {
+                  <option [value]="courier.user_id">{{ courier.name }} ({{ courier.zoneActivite }})</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Instructions</label>
+              <textarea id="description"
+                        class="custom-textarea"
+                        placeholder="Notes pour le livraison..."
+                        [(ngModel)]="description"
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <div class="action-footer">
           <button class="btn-primary" (click)="acceptAssignment()">
             Assigner
           </button>
@@ -77,45 +92,29 @@
             Annuler
           </button>
         </div>
-    </div>
-
-    <aside class="sidebar-section">
-      <div class="content-card financial-card">
-        <h2>Résumé Financier</h2>
-        
-        <div class="financial-group">
-          <h3 class="group-title">Enlèvement (Pickup)</h3>
-          <div class="price-row">
-            <span>Transport (Trucking)</span>
-            <span class="amount">{{ order().prices.trucking | number:'1.2-2' }}</span>
-          </div>
-        </div>
-
-        <div class="financial-group border-top">
-          <h3 class="group-title">Origine</h3>
-          <div class="price-row">
-            <span>Assurance B/L</span>
-            <span class="amount">{{ order().prices.insurance | number:'1.2-2' }}</span>
-          </div>
-          <div class="price-row">
-            <span>Surcharge Carburant</span>
-            <span class="amount">{{ order().prices.fuelSurcharge | number:'1.2-2' }}</span>
-          </div>
-          <div class="price-row">
-            <span>Frais d'entrepôt CFS</span>
-            <span class="amount">{{ order().prices.warehouse | number:'1.2-2' }}</span>
-          </div>
-          <div class="price-row">
-            <span>Frais Chassis</span>
-            <span class="amount">{{ order().prices.chassis | number:'1.2-2' }}</span>
-          </div>
-        </div>
-
-        <div class="total-row">
-          <span>Total</span>
-          <span class="total-amount">USD {{ calculateTotal() | number:'1.2-2' }}</span>
-        </div>
       </div>
-    </aside>
-  </div>
+
+      <aside class="sidebar-section">
+        <div class="content-card financial-card">
+          <h2>Résumé Financier</h2>
+
+          <div class="financial-group">
+            <div class="price-row">
+              <span>Total Produits</span>
+              <span class="amount">{{ order().total | number:'1.2-2' }} €</span>
+            </div>
+            <div class="price-row">
+              <span>Méthode de paiement</span>
+              <span class="amount">{{ order().paymentMethod | titlecase }}</span>
+            </div>
+          </div>
+
+          <div class="notes-section">
+            <h3>Notes</h3>
+            <p>{{ order().notes || 'Aucune note' }}</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  }
 </div>

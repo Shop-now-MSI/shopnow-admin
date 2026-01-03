@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ApiService } from '../../core/services/api';
 import { SlidersHorizontal, LucideAngularModule, EllipsisVertical } from 'lucide-angular/src/icons';
 
 @Component({
@@ -12,7 +11,6 @@ export class Dashboard {
   slidersHorizontal = SlidersHorizontal;
   moreVertical = EllipsisVertical;
 
-  constructor(private api: ApiService) {}
 
   ngOnInit(): void {}
 
