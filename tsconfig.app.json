@@ -10,7 +10,7 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "src/app/leaflet.config.ts"  ],
   "exclude": [
     "src/**/*.spec.ts"
   ]

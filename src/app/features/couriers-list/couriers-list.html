@@ -4,33 +4,59 @@
       <h1>Gestion des Livreurs</h1>
       <p>Gérez et suivez les performances de votre flotte de livraison</p>
     </div>
-    <div class="header-actions">
-      <button class="btn-primary" routerLink="/admin/courier-form">
-        <lucide-icon [img]="plus"></lucide-icon>
-        Nouveau Livreur
-      </button>
+    <div class="header-right">
+      <!-- <div class="stats-summary">
+        <span class="stat-total">Total: {{ stats().total }}</span>
+        @if (searchQuery()) {
+          <span class="stat-filtered">Filtrés: {{ stats().filtered }}</span>
+        }
+        <span class="stat-zones">Zones: {{ stats().zonesCount }}</span>
+      </div> -->
+      <div class="header-actions">
+        <button class="btn-primary" routerLink="/admin/courier-form">
+          <lucide-icon [img]="plus"></lucide-icon>
+          Nouveau Livreur
+        </button>
+      </div>
     </div>
   </header>
-  <section class="filters-bar">
-    <div class="filters-group">
-      <select class="select-filter">
-        <option>Statut: Tous</option>
-        <option>En service</option>
-        <option>Hors ligne</option>
-      </select>
-     
-      <select class="select-filter">
-        <option>Zone: Toutes</option>
-        <option>Paris</option>
-        <option>Lyon</option>
-      </select>
+
+  <!-- Barre de recherche -->
+  <section class="search-bar">
+    <div class="search-container">
+      <div class="search-input-group">
+        <lucide-icon [img]="searchIcon" class="search-icon"></lucide-icon>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Rechercher un livreur (nom, prénom, email, téléphone, zone, véhicule...)"
+          [value]="searchQuery()"
+          (input)="onSearchChange($event)"
+        />
+        @if (searchQuery()) {
+          <button class="search-clear" (click)="clearSearch()">
+            <lucide-icon [img]="trash" size="16"></lucide-icon>
+          </button>
+        }
+      </div>
+      
+      @if (searchQuery() && filteredCouriers().length > 0) {
+        <div class="search-results-info">
+          {{ filteredCouriers().length }} résultat{{ filteredCouriers().length !== 1 ? 's' : '' }} trouvé{{ filteredCouriers().length !== 1 ? 's' : '' }}
+        </div>
+      }
     </div>
-   
-    <button class="btn-clear">
-      <lucide-icon [img]="trash"></lucide-icon>
-      Effacer tout
-    </button>
   </section>
+
+  <!-- Indicateur de chargement -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>Chargement des livreurs...</p>
+    </div>
+  }
+
+  <!-- Tableau des livreurs -->
   <div class="table-wrapper">
     @if (canScrollLeft()) {
       <button class="scroll-btn left" (click)="scrollTable(-200)">
@@ -42,6 +68,7 @@
         <lucide-icon [img]="chevronRight"></lucide-icon>
       </button>
     }
+    
     <div class="table-container" #tableContainer (scroll)="onScroll()">
       <table class="data-table">
         <thead>
@@ -50,82 +77,116 @@
             <th>Email</th>
             <th>Téléphone</th>
             <th>Zone</th>
-            <th>Livraisons</th>
-            <th>Note</th>
-            <th>Statut</th>
+            <th>Type Véhicule</th>
+            <th>Contrat</th>
+            <th>Matricule</th>
+            <th>Date Naissance</th>
             <th class="text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
-          @for (courier of paginatedCouriers(); track courier.id) {
-            <tr class="table-row">
-              <td>
-                <div class="user-cell">
-                  <img [src]="courier.avatar" alt="" class="user-avatar">
-                  <span class="user-name">{{ courier.name }}</span>
-                </div>
-              </td>
-              <td class="text-muted">{{ courier.email }}</td>
-              <td class="text-muted">{{ courier.phone }}</td>
-              <td>{{ courier.zone }}</td>
-              <td><strong class="highlight">{{ courier.totalDeliveries }}</strong></td>
-              <td>
-                <span class="rating">
-                  <lucide-icon [img]="star" class="star-icon"></lucide-icon>
-                  {{ courier.rating }}
-                </span>
-              </td>
-              <td>
-                <span class="status-badge" [class]="courier.status">
-                  @switch (courier.status) {
-                    @case ('service') { En service }
-                    @case ('disponible') { Disponible }
-                    @case ('pause') { En pause }
-                  }
-                </span>
-              </td>
-              <td class="text-right">
-                <div class="actions">
-                  <button class="icon-btn" title="Voir détails" [routerLink]="['/admin/coursier-details', courier.id]">
-                    <lucide-icon [img]="eye"></lucide-icon>
-                  </button>
-                  <button class="icon-btn edit" title="Modifier" [routerLink]="['/admin/courier-form', courier.id]">
-                    <lucide-icon [img]="pencil"></lucide-icon>
-                  </button>
-                  <button class="icon-btn delete" title="Supprimer" (click)="deleteCourier(courier.id)">
-                    <lucide-icon [img]="trash2"></lucide-icon>
-                  </button>
-                </div>
+          @if (filteredCouriers().length === 0) {
+            <tr>
+              <td colspan="9" class="empty-state">
+                @if (searchQuery()) {
+                  <p>Aucun livreur ne correspond à votre recherche</p>
+                  <button class="btn-text" (click)="clearSearch()">Effacer la recherche</button>
+                } @else {
+                  <p>Aucun livreur disponible</p>
+                  <button class="btn-primary" routerLink="/admin/courier-form">Ajouter un livreur</button>
+                }
               </td>
             </tr>
-          } @empty {
-             <tr><td colspan="8" style="text-align:center; padding: 20px;">Aucun livreur trouvé</td></tr>
+          } @else {
+            @for (courier of paginatedCouriers(); track courier.user_id) {
+              <tr class="table-row">
+                <td>
+                  <div class="user-cell">
+                    <img [src]="courier.photo || 'https://i.pravatar.cc/150?u=' + courier.user_id" 
+                         alt="{{ courier.firstname }} {{ courier.name }}" 
+                         class="user-avatar">
+                    <div class="user-info">
+                      <span class="user-name">{{ courier.firstname }} {{ courier.name }}</span>
+                      <span class="user-id">ID: {{ courier.user_id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-muted">{{ courier.user.email }}</td>
+                <td class="text-muted">{{ courier.tel || '—' }}</td>
+                <td>
+                  <span class="zone-badge">{{ courier.zoneActivite }}</span>
+                </td>
+                <td>
+                  <span class="vehicle-badge">{{ courier.typeVehicule }}</span>
+                </td>
+                <td>
+                  <span class="contract-badge" [class]="courier.typeContrat!.toLowerCase()">
+                    {{ courier.typeContrat }}
+                  </span>
+                </td>
+                <td>{{ courier.matricule || '—' }}</td>
+                <td>{{ courier.dateNaissance | date:'dd/MM/yyyy' }}</td>
+                <td class="text-right">
+                  <div class="actions">
+                    <button class="icon-btn" title="Voir détails" [routerLink]="['/admin/coursier-details', courier.user_id]">
+                      <lucide-icon [img]="eye"></lucide-icon>
+                    </button>
+                    <button class="icon-btn edit" title="Modifier" [routerLink]="['/admin/courier-form', courier.user_id]">
+                      <lucide-icon [img]="pencil"></lucide-icon>
+                    </button>
+                    <button class="icon-btn delete" title="Supprimer" (click)="deleteCourier(courier.user_id)">
+                      <lucide-icon [img]="trash2"></lucide-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>
     </div>
   </div>
-  <footer class="pagination">
-    <span class="page-info">{{ paginationInfo() }}</span>
-    <div class="page-controls">
-     
-      <button class="page-btn"
-              [disabled]="currentPage() === 1"
-              (click)="prevPage()">
-        <lucide-icon [img]="chevronLeft"></lucide-icon>
-      </button>
-      @for (page of pagesArray(); track page) {
-        <button class="page-btn"
-                [class.active]="currentPage() === page"
-                (click)="goToPage(page)">
-          {{ page }}
+
+  <!-- Pagination -->
+  @if (filteredCouriers().length > 0) {
+    <footer class="pagination">
+      <div class="pagination-left">
+        <span class="page-info">{{ paginationInfo() }}</span>
+        
+        <!-- Sélection du nombre d'éléments par page -->
+        <div class="items-per-page">
+          <label>Afficher</label>
+          <select class="select-small" (change)="onItemsPerPageChange($event)">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>par page</span>
+        </div>
+      </div>
+      
+      <div class="page-controls">
+        <button class="page-btn" [disabled]="currentPage() === 1" (click)="prevPage()">
+          <lucide-icon [img]="chevronLeft"></lucide-icon>
         </button>
-      }
-      <button class="page-btn"
-              [disabled]="currentPage() === totalPages()"
-              (click)="nextPage()">
-        <lucide-icon [img]="chevronRight"></lucide-icon>
-      </button>
-    </div>
-  </footer>
+
+        @for (page of pagesArray(); track page) {
+          @if (page === -1) {
+            <span class="page-ellipsis">...</span>
+          } @else {
+            <button class="page-btn"
+                    [class.active]="currentPage() === page"
+                    (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          }
+        }
+
+        <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+          <lucide-icon [img]="chevronRight"></lucide-icon>
+        </button>
+      </div>
+    </footer>
+  }
 </div>

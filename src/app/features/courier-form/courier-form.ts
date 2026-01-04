@@ -1,11 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule, User, Upload, Save, X, ChevronLeft } from 'lucide-angular';
 import { LivreurService } from '../../services/livreur.service';
 import { CreateLivreurRequest, UpdateLivreurRequest, Livreur } from '../../shared/interfaces/livreur.interface';
-import e from 'express';
+import { ToastService } from '../../services/toast.service'; // Import ToastService
 
 @Component({
   selector: 'app-courier-form',
@@ -27,17 +27,16 @@ export class CourierForm {
 
   // Signal pour l'objet coursier
   courier = signal({
-    firstName: '',
-    lastName: '',
+    firstname: '',
+    name: '',
     email: '',
-    password: '', // Ajouté pour la création
-    phone: '',
-    dob: '',
-    vehicleType: '',
-    zone: '',
-    startDate: '', // Non utilisé dans le backend, mais conservé
-    contractType: '',
-    licensePlate: ''
+    password: '',
+    tel: '',
+    dateNaissance: '',
+    typeVehicule: '',
+    zoneActivite: '',
+    typeContrat: '',
+    matricule: ''
   });
 
   // Fichier photo sélectionné
@@ -47,9 +46,11 @@ export class CourierForm {
   private id: number | null = null;
   public edit = signal(false);
 
-  // Loading et erreur
+  // Loading
   isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
+
+  // Inject ToastService
+  private toastService = inject(ToastService);
 
   constructor(
     private livreurService: LivreurService,
@@ -70,25 +71,25 @@ export class CourierForm {
     this.livreurService.getById(id).subscribe({
       next: (livreur: Livreur) => {
         this.courier.set({
-          firstName: livreur.firstname,
-          lastName: livreur.name,
+          firstname: livreur.firstname,
+          name: livreur.name,
           email: livreur.user.email,
-          password: "", // Non chargé pour édition
-          phone: livreur.tel,
-          dob: livreur.dateNaissance,
-          vehicleType: livreur.typeVehicule,
-          zone: livreur.zoneActivite,
-          startDate: '', // Non présent, laisser vide
-          contractType: livreur.typeContrat,
-          licensePlate: livreur.matricule
+          password: '',
+          tel: livreur.tel,
+          dateNaissance: livreur.dateNaissance,
+          typeVehicule: livreur.typeVehicule,
+          zoneActivite: livreur.zoneActivite,
+          typeContrat: livreur.typeContrat,
+          matricule: livreur.matricule
         });
         this.previewUrl.set(livreur.photo);
         this.isLoading.set(false);
+        this.toastService.success('Livreur chargé avec succès');
       },
       error: (err) => {
         console.error('Erreur chargement livreur:', err);
-        this.errorMessage.set('Erreur lors du chargement des données');
         this.isLoading.set(false);
+        this.toastService.error('Erreur lors du chargement des données du livreur');
       }
     });
   }
@@ -97,72 +98,123 @@ export class CourierForm {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.selectedPhoto = input.files[0];
+      const file = input.files[0];
+      
+      // Validation de la taille (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        this.toastService.error('La photo ne doit pas dépasser 5MB', 4000);
+        return;
+      }
 
+      // Validation du type
+      if (!file.type.match(/image\/(jpeg|jpg|png)/)) {
+        this.toastService.error('Format de fichier non supporté. Utilisez JPG ou PNG', 4000);
+        return;
+      }
+
+      this.selectedPhoto = file;
       // Création de l'URL pour la prévisualisation
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl.set(e.target?.result as string);
       };
       reader.readAsDataURL(this.selectedPhoto);
+      this.toastService.info('Photo sélectionnée', 2000);
     }
   }
 
-  saveCourier() {
-    this.isLoading.set(true);
-    this.errorMessage.set(null);
+  // Méthode de validation des champs
+  private validateForm(): boolean {
+    const data = this.courier();
+    const errors: string[] = [];
 
+    if (!data.firstname.trim()) errors.push('Le prénom est requis');
+    if (!data.name.trim()) errors.push('Le nom est requis');
+    if (!data.email.trim()) errors.push('L\'email est requis');
+    if (!data.tel.trim()) errors.push('Le téléphone est requis');
+    if (!data.dateNaissance) errors.push('La date de naissance est requise');
+    if (!data.typeVehicule) errors.push('Le type de véhicule est requis');
+    if (!data.zoneActivite) errors.push('La zone d\'activité est requise');
+    if (!data.typeContrat) errors.push('Le type de contrat est requis');
+    if (!data.matricule.trim()) errors.push('Le matricule est requis');
+
+    // Validation email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (data.email && !emailRegex.test(data.email)) {
+      errors.push('Format d\'email invalide');
+    }
+
+    if (errors.length > 0) {
+      this.toastService.error(errors.join('<br>'), 6000);
+      return false;
+    }
+
+    return true;
+  }
+
+  saveCourier() {
+    // Validation du formulaire
+    if (!this.validateForm()) {
+      return;
+    }
+
+    this.isLoading.set(true);
     const data = this.courier();
 
     if (this.id) {
       // Mode update
       const updateData: UpdateLivreurRequest = {
-        name: data.lastName,
+        name: data.name,
+        firstname: data.firstname,
         email: data.email,
-        matricule: data.licensePlate,
-        typeContrat: data.contractType as 'temps plein' | 'temps partiel' | 'freelance'
-        // Ajoute d'autres champs si nécessaires, ex. tel, dateNaissance, etc.
-        // Note: Le controller update ne gère que certains champs, mais on envoie ce qui est changé
+        tel: data.tel,
+        dateNaissance: data.dateNaissance,
+        typeVehicule: data.typeVehicule,
+        zoneActivite: data.zoneActivite,
+        typeContrat: data.typeContrat as 'temps plein' | 'temps partiel' | 'freelance',
+        matricule: data.matricule
       };
-      // Photo non gérée dans update pour l'instant (ajoute si besoin)
+
       this.livreurService.update(this.id, updateData).subscribe({
         next: () => {
-          this.router.navigate(['/admin/couriers-list']);
+          this.toastService.success('Livreur modifié avec succès');
+          setTimeout(() => {
+            this.router.navigate(['/admin/couriers-list']);
+          }, 1500);
         },
         error: (err) => {
           console.error('Erreur update:', err);
-          this.errorMessage.set('Erreur lors de la mise à jour');
           this.isLoading.set(false);
+          this.toastService.error('Erreur lors de la mise à jour du livreur');
         }
       });
     } else {
       // Mode create
-      if (!data.password) {
-        this.errorMessage.set('Le mot de passe est requis pour la création');
-        this.isLoading.set(false);
-        return;
-      }
       const createData: CreateLivreurRequest = {
-        name: data.lastName,
-        firstname: data.firstName,
+        name: data.name,
+        firstname: data.firstname,
         email: data.email,
-        password: data.password,
-        tel: data.phone,
-        dateNaissance: data.dob,
-        typeVehicule: data.vehicleType,
-        zoneActivite: data.zone,
-        typeContrat: data.contractType as 'temps plein' | 'temps partiel' | 'freelance',
-        matricule: data.licensePlate,
+        password: data.password || 'motdepasse',
+        tel: data.tel,
+        dateNaissance: data.dateNaissance,
+        typeVehicule: data.typeVehicule,
+        zoneActivite: data.zoneActivite,
+        typeContrat: data.typeContrat as 'temps plein' | 'temps partiel' | 'freelance',
+        matricule: data.matricule,
         photo: this.selectedPhoto || undefined
       };
+
       this.livreurService.create(createData).subscribe({
         next: () => {
-          this.router.navigate(['/admin/couriers-list']);
+          this.toastService.success('Livreur créé avec succès');
+          setTimeout(() => {
+            this.router.navigate(['/admin/couriers-list']);
+          }, 1500);
         },
         error: (err) => {
           console.error('Erreur création:', err);
-          this.errorMessage.set('Erreur lors de la création');
           this.isLoading.set(false);
+          this.toastService.error('Erreur lors de la création du livreur');
         }
       });
     }

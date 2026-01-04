@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { Livreur, CreateLivreurRequest, UpdateLivreurRequest } from '../shared/interfaces/livreur.interface';
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LivreurService {
-  private apiUrl = environment.apiUrl; 
+  private apiUrl = 'http://localhost:8000/api/'; // Adapte
 
   constructor(private http: HttpClient) {}
 
@@ -73,6 +72,6 @@ export class LivreurService {
 
   private handleError(error: any): Observable<never> {
     console.error('An error occurred:', error);
-    return throwError(() => new Error(error.error.message));
+    return throwError(() => new Error('Something went wrong; please try again later.'));
   }
 }

@@ -1,7 +1,6 @@
-import { User } from "./user.interface";
+  import { User } from "./user.interface";
 
 export interface Livreur {
-  id: number;
   user_id: number;
   name: string;
   firstname: string;
@@ -12,7 +11,8 @@ export interface Livreur {
   typeContrat: 'temps plein' | 'temps partiel' | 'freelance';
   matricule: string;
   photo: string | null; // URL de la photo
-  // Ajoute d'autres champs si nécessaires, comme created_at, updated_at
+  created_at: string;
+  updated_at: string;
   user: User; // Référence à l'interface User existante
 }
 
@@ -35,6 +35,12 @@ export interface UpdateLivreurRequest {
   email?: string;
   matricule?: string;
   typeContrat?: 'temps plein' | 'temps partiel' | 'freelance';
+  firstname?: string;
+  tel?:string;
+  dateNaissance?: string;
+  typeVehicule?: string;
+  zoneActivite?: string;
+  photo?: File;
   // Ajoute d'autres champs optionnels basés sur le controller update
   // Note: password n'est pas géré dans update ici, mais si besoin, ajoute-le
 }

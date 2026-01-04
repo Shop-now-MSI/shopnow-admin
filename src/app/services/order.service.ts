@@ -1,5 +1,3 @@
-// 2. Service pour Order : src/app/services/order.service.ts
-
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -10,7 +8,7 @@ import { Order, AssignLivreurRequest, UpdateAssignationRequest, CancelOrderReque
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = 'http://localhost:8000/api/'; // Adapte à ton backend Laravel
+  private apiUrl = 'http://localhost:8000/api/';
 
   constructor(private http: HttpClient) {}
 
@@ -28,38 +26,12 @@ export class OrderService {
     );
   }
 
-assignLivreur(data: { idCommande: number, idLivreur: number }): Observable<{
-  message: string;
-  order_status: string;
-  livraison: {
-    id: string; // UUID
-    order_id: number;
-    livreur_id: number;
-    status: string;
-    date_livraison: string | null;
-    created_at: string;
-    updated_at: string;
+  // Assign livreur: POST /commandes/assigner
+  assignLivreur(data: AssignLivreurRequest): Observable<{ message: string; order_status: string; livraison: any }> {
+    return this.http.post<{ message: string; order_status: string; livraison: any }>(`${this.apiUrl}commandes/assigner`, data, { headers: this.getAuthHeaders() }).pipe(
+      catchError(this.handleError)
+    );
   }
-}> {
-  return this.http.post<{
-    message: string;
-    order_status: string;
-    livraison: {
-      id: string;
-      order_id: number;
-      livreur_id: number;
-      status: string;
-      date_livraison: string | null;
-      created_at: string;
-      updated_at: string;
-    }
-  }>(`${this.apiUrl}commandes/assigner`, data, {
-    headers: this.getAuthHeaders()
-  }).pipe(
-    catchError(this.handleError)
-  );
-}
-
 
   // Update assignation: POST /commandes/modifier-assignation
   updateAssignation(data: UpdateAssignationRequest): Observable<{ message: string; livraison: any }> {
@@ -75,7 +47,7 @@ assignLivreur(data: { idCommande: number, idLivreur: number }): Observable<{
     );
   }
 
-  // Helpers privés (similaires aux services précédents pour cohérence)
+  // Helpers privés
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('authToken');
     return new HttpHeaders({

@@ -1,23 +1,32 @@
-import { User } from './user.interface'; // Importe depuis l'interface User existante
-//import { Product } from './product.interface'; 
+// src/app/shared/interfaces/order.interface.ts
+// (Ajoute ou mets à jour ce fichier avec les champs exacts du JSON)
 
-// Interface basique pour Product (si pas déjà défini)
-export interface Product {
+import { Livreur } from './livreur.interface';
+import { User } from './user.interface';
+import { Product } from './product.interface';
+
+export interface OrderItem {
   id: number;
-  name: string;
-  price: number;
-  description: string;
-  // Ajoute d'autres champs comme description, image, etc.
+  order_id: number;
+  product_id: number;
+  quantite: number; // Note: 'quantite' comme dans le JSON
+  type: string;
+  created_at: string;
+  updated_at: string;
+  product: Product;
 }
 
 export interface Livraison {
-  id: number | string; // UUID ? Utilise string si c'est UUID, sinon number
+  id: string; // UUID
   order_id: number;
   livreur_id: number;
-  status: string; // ex. 'en cours'
+  status: string;
+  raison_echec: string | null;
+  commentaire_echec: string | null;
   date_livraison: string | null;
-  livreur: { user: User };
-  // Ajoute positions, preuves si chargées
+  created_at: string;
+  updated_at: string;
+  livreur: Livreur;
 }
 
 export interface Order {
@@ -25,52 +34,20 @@ export interface Order {
   date: string;
   livree: boolean;
   client_id: number;
-  delivery_status: 'en attente' | 'en cours' | 'livré' | 'annulé';
+  delivery_status: string;
   address: string;
   country: string;
   region: string;
   city: string;
   zip: string;
-  payment_method: 'carte' | 'paypal' | 'virement';
+  payment_method: string;
   notes: string;
-  total: string;
+  total: string; 
   created_at: string;
   updated_at: string;
-  user: {
-    id: number;
-    name: string;
-    firstname: string;
-    email: string;
-    email_verified_at: null | string;
-    type: string;
-    role: string;
-    created_at: string;
-    updated_at: string;
-  };
-  order_items: Array<{
-    id: number;
-    order_id: number;
-    product_id: number;
-    quantite: number;
-    type: string;
-    created_at: string;
-    updated_at: string;
-    product: {
-      id: number;
-      name: string;
-      brand: string;
-      category: string;
-      sub_category: string;
-      stock: number;
-      price: string;
-      small_description: string;
-      description: string;
-      images: string[] | null;
-      created_at: string;
-      updated_at: string;
-    };
-  }>;
-  livraison: null | any; // Remplacez 'any' par une interface spécifique si vous avez des détails sur la structure de 'livraison'
+  user: User; // Client
+  order_items: OrderItem[]; 
+  livraison?: Livraison;
 }
 
 export interface AssignLivreurRequest {
@@ -79,7 +56,7 @@ export interface AssignLivreurRequest {
 }
 
 export interface UpdateAssignationRequest {
-  idLivraison: number | string;
+  idLivraison: string;
   idCommande: number;
   idLivreur: number;
 }
