@@ -26,6 +26,7 @@ export interface Livraison {
   date_livraison: string | null;
   created_at: string;
   updated_at: string;
+  order: Order;
   livreur: Livreur;
 }
 

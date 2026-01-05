@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Order, AssignLivreurRequest, UpdateAssignationRequest, CancelOrderRequest } from '../shared/interfaces/order.interface';
+import { Order, AssignLivreurRequest, UpdateAssignationRequest, CancelOrderRequest, Livraison } from '../shared/interfaces/order.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +40,13 @@ export class OrderService {
     );
   }
 
+  // Get livraisons by livreur ID: GET /livreurs/{idlivreur}/livraisons
+  getLivraisonsByLivreurId(idlivreur: number): Observable<Livraison[]> {
+    return this.http.get<Livraison[]>(`${this.apiUrl}livreurs/${idlivreur}/livraisons`, { headers: this.getAuthHeaders() }).pipe(
+      catchError(this.handleError)
+    );
+  }
+  
   // Cancel order: POST /commandes/annuler
   cancel(data: CancelOrderRequest): Observable<{ message: string; idCommande: number }> {
     return this.http.post<{ message: string; idCommande: number }>(`${this.apiUrl}commandes/annuler`, data, { headers: this.getAuthHeaders() }).pipe(

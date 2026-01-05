@@ -2,3 +2,77 @@
 body{
     margin: 0;
 }
+
+/* Styles pour les marqueurs personnalisés */
+.user-marker .pulse-dot {
+  width: 20px;
+  height: 20px;
+  background: #3b82f6;
+  border-radius: 50%;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: inherit;
+    animation: pulse 1.5s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Popups Leaflet */
+.leaflet-popup-content {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 250px;
+  
+  h4 {
+    margin: 0 0 8px 0;
+    color: #1f2937;
+    font-size: 16px;
+  }
+  
+  p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+  }
+}
+
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+  
+  a {
+    background: white !important;
+    border: none !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+    
+    &:hover {
+      background: #f3f4f6 !important;
+    }
+  }
+}
+
+/* Styles pour les cartes en mode sombre */
+.dark-mode-map .leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+.dark-mode-map .leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.7) !important;
+  color: #ccc !important;
+}
