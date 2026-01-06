@@ -1,38 +1,10 @@
-import { Component, signal, computed, viewChild, ElementRef, AfterViewInit, OnInit } from '@angular/core';
+import { Component, signal, computed, viewChild, ElementRef, AfterViewInit, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Plus, Trash, ChevronLeft, ChevronRight, ArrowBigRightDash, Pencil, Trash2, Eye } from 'lucide-angular';
-import { Router, RouterModule } from '@angular/router';
+import { LucideAngularModule, Trash, ChevronLeft, ChevronRight, Eye, ArrowBigRightDash } from 'lucide-angular';
+import { RouterModule } from '@angular/router';
 import { OrderService } from '../../services/order.service';
 import { Order } from '../../shared/interfaces/order.interface';
-
-
-interface OrderDisplay {
-  id: number;
-  trackingId: string;
-  clientName: string;
-  clientEmail: string;
-  clientAvatar: string;
-  deliveryAddress: string;
-  city: string;
-  zip: string;
-  country: string;
-  date: string;
-  amount: number;
-  paymentMethod: string;
-  paymentStatus: 'paid' | 'pending';
-  status: 'pending' | 'transit' | 'delivered' | 'cancelled';
-  notes: string;
-  products: Array<{
-    name: string;
-    brand: string;
-    quantity: number;
-    price: number;
-    totalPrice: number;
-    images: string[] | null;
-  }>;
-}
-
-
+import { ToastService } from '../../services/toast.service'; // Import ToastService
 
 @Component({
   selector: 'app-orders-list',
@@ -43,108 +15,231 @@ interface OrderDisplay {
 })
 export class OrdersList implements AfterViewInit, OnInit {
   // Icônes
-  readonly plus = Plus; readonly trash = Trash;
-  readonly chevronLeft = ChevronLeft; readonly chevronRight = ChevronRight;
-  readonly pencil = Pencil; readonly trash2 = Trash2; readonly eye = Eye;
-  readonly ArrowBigRightDash  = ArrowBigRightDash 
+  readonly trash = Trash;
+  readonly chevronLeft = ChevronLeft;
+  readonly chevronRight = ChevronRight;
+  readonly eye = Eye;
+  readonly ArrowBigRightDash = ArrowBigRightDash;
 
+  // Services
+  private orderService = inject(OrderService);
+  private toastService = inject(ToastService);
 
   // --- SCROLL TABLEAU ---
   canScrollLeft = signal(false);
   canScrollRight = signal(true);
   tableContainer = viewChild<ElementRef>('tableContainer');
 
+  // --- FILTRES ---
+  // Liste des statuts disponibles (modifiable facilement)
+  statusOptions = signal([
+    { value: '', label: 'Tous les statuts' },
+    { value: 'en attente', label: 'En attente' },
+    { value: 'en cours', label: 'En cours' },
+    { value: 'livré', label: 'Livré' },
+    { value: 'annulé', label: 'Annulé' },
+  ]);
+
+  // Filtres actifs
+  selectedStatus = signal<string>('');
+  selectedPeriod = signal<string>(''); // Optionnel pour plus tard
+  searchQuery = signal<string>(''); // Pour recherche textuelle
+
   // --- DONNÉES COMMANDES ---
-  allOrders = signal<OrderDisplay[]>([]);
+  allOrders = signal<Order[]>([]);
+  isLoading = signal(false);
+
+  // Commandes filtrées
+  filteredOrders = computed(() => {
+    let filtered = this.allOrders();
+
+    // Filtre par statut
+    if (this.selectedStatus()) {
+      filtered = filtered.filter(order => 
+        order.delivery_status?.toLowerCase() === this.selectedStatus().toLowerCase()
+      );
+    }
+
+    // Filtre par recherche (optionnel - recherche dans client, adresse, ID)
+    if (this.searchQuery().trim()) {
+      const query = this.searchQuery().toLowerCase().trim();
+      filtered = filtered.filter(order => 
+        order.user?.firstname?.toLowerCase().includes(query) ||
+        order.user?.name?.toLowerCase().includes(query) ||
+        order.user?.email?.toLowerCase().includes(query) ||
+        order.address?.toLowerCase().includes(query) ||
+        order.city?.toLowerCase().includes(query) ||
+        order.id?.toString().includes(query)
+      );
+    }
+
+    // Filtre par période (exemple - à adapter selon vos besoins)
+    if (this.selectedPeriod()) {
+      const today = new Date();
+      const orderDate = new Date();
+      
+      filtered = filtered.filter(order => {
+        orderDate.setTime(new Date(order.created_at).getTime());
+        
+        switch(this.selectedPeriod()) {
+          case 'today':
+            return orderDate.toDateString() === today.toDateString();
+          case 'week':
+            const weekAgo = new Date(today);
+            weekAgo.setDate(today.getDate() - 7);
+            return orderDate >= weekAgo;
+          case 'month':
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(today.getMonth() - 1);
+            return orderDate >= monthAgo;
+          case 'year':
+            const yearAgo = new Date(today);
+            yearAgo.setFullYear(today.getFullYear() - 1);
+            return orderDate >= yearAgo;
+          default:
+            return true;
+        }
+      });
+    }
+
+    return filtered;
+  });
 
   // --- PAGINATION ---
   currentPage = signal(1);
-  itemsPerPage = signal(5);
-  totalPages = computed(() => Math.ceil(this.allOrders().length / this.itemsPerPage()));
+  itemsPerPage = signal(10); // Augmenté à 10 pour plus de visibilité
+  totalPages = computed(() => Math.ceil(this.filteredOrders().length / this.itemsPerPage()));
+  
   paginatedOrders = computed(() => {
     const startIndex = (this.currentPage() - 1) * this.itemsPerPage();
-    return this.allOrders().slice(startIndex, startIndex + this.itemsPerPage());
+    return this.filteredOrders().slice(startIndex, startIndex + this.itemsPerPage());
   });
-  pagesArray = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
+  
+  pagesArray = computed(() => {
+    const total = this.totalPages();
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    
+    const current = this.currentPage();
+    let pages = [1];
+    
+    if (current > 4) pages.push(-1); // Ellipsis
+    
+    const start = Math.max(2, current - 2);
+    const end = Math.min(total - 1, current + 2);
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (current < total - 3) pages.push(-1); // Ellipsis
+    
+    if (total > 1) pages.push(total);
+    
+    return pages;
+  });
+  
   paginationInfo = computed(() => {
-    const total = this.allOrders().length;
+    const total = this.filteredOrders().length;
     if (total === 0) return 'Aucune commande';
     const start = (this.currentPage() - 1) * this.itemsPerPage() + 1;
     const end = Math.min(start + this.itemsPerPage() - 1, total);
-    return `Affichage ${start}-${end} sur ${total} commandes`;
+    return `${start}-${end} sur ${total} commande${total > 1 ? 's' : ''}`;
   });
 
-  constructor(private orderService: OrderService, private router: Router) {}
+  // Compteurs par statut
+  statusCounts = computed(() => {
+    const counts: { [key: string]: number } = {};
+    this.statusOptions().forEach(status => {
+      if (status.value) {
+        counts[status.value] = this.allOrders().filter(order => 
+          order.delivery_status?.toLowerCase() === status.value.toLowerCase()
+        ).length;
+      }
+    });
+    counts['all'] = this.allOrders().length;
+    return counts;
+  });
+
+  constructor() {}
 
   ngOnInit() {
     this.fetchOrders();
   }
 
   // Fetch des commandes via le service
-private fetchOrders() {
-  this.orderService.getAll().subscribe({
-    next: (orders) => {
-      const mappedOrders: OrderDisplay[] = orders.map(o => ({
-        id: o.id,
-        trackingId: o.zip,
-        clientName: `${o.user.firstname} ${o.user.name}`,
-        clientEmail: o.user.email,
-        clientAvatar: `https://i.pravatar.cc/150?u=${o.user.id}`,
-        deliveryAddress: o.address,
-        city: o.city,
-        zip: o.zip,
-        country: o.country,
-        date: this.formatDate(o.date || new Date().toISOString()),
-        amount: parseFloat(o.total),
-        paymentMethod: o.payment_method,
-        paymentStatus: o.payment_method === 'carte' || o.payment_method === 'paypal' ? 'paid' : 'pending',
-        status: this.mapStatus(o.delivery_status),
-        notes: o.notes || 'Aucune note',
-        products: o.order_items.map(item => ({
-          name: item.product.name,
-          brand: item.product.brand,
-          quantity: item.quantite,
-          price: parseFloat(item.product.price),
-          totalPrice: parseFloat(item.product.price) * item.quantite,
-          images: item.product.images || []
-        }))
-      }));
-      this.allOrders.set(mappedOrders);
-    },
-    error: (err) => {
-      console.error('Erreur lors du chargement des commandes:', err);
-    }
-  });
-}
-
-
-
-  private formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+  private fetchOrders() {
+    this.isLoading.set(true);
+    this.orderService.getAll().subscribe({
+      next: (orders) => {
+        this.allOrders.set(orders);
+        this.isLoading.set(false);
+        this.toastService.success(`${orders.length} commandes chargées`);
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des commandes:', err);
+        this.isLoading.set(false);
+        this.toastService.error('Erreur lors du chargement des commandes');
+      }
+    });
   }
 
-  private mapStatus(deliveryStatus: string): 'pending' | 'transit' | 'delivered' | 'cancelled' {
-    switch (deliveryStatus) {
-      case 'en cours':
-        return 'transit';
-      case 'livré':
-        return 'delivered';
-      case 'annulé':
-        return 'cancelled';
-      default:
-        return 'pending';
-    }
+  // --- GESTION DES FILTRES ---
+  onStatusChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.selectedStatus.set(select.value);
+    this.currentPage.set(1); // Retour à la première page quand on change de filtre
+  }
+
+  onPeriodChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.selectedPeriod.set(select.value);
+    this.currentPage.set(1);
+  }
+
+  onSearchChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery.set(input.value);
+    this.currentPage.set(1);
+  }
+
+  clearFilters() {
+    this.selectedStatus.set('');
+    this.selectedPeriod.set('');
+    this.searchQuery.set('');
+    this.currentPage.set(1);
+    this.toastService.info('Filtres réinitialisés');
   }
 
   // --- NAVIGATION ---
-  nextPage() { if (this.currentPage() < this.totalPages()) this.currentPage.update(p => p + 1); }
-  prevPage() { if (this.currentPage() > 1) this.currentPage.update(p => p - 1); }
-  goToPage(page: number) { this.currentPage.set(page); }
+  nextPage() { 
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update(p => p + 1);
+      this.scrollToTop();
+    }
+  }
+  
+  prevPage() { 
+    if (this.currentPage() > 1) {
+      this.currentPage.update(p => p - 1);
+      this.scrollToTop();
+    }
+  }
+  
+  goToPage(page: number) { 
+    this.currentPage.set(page);
+    this.scrollToTop();
+  }
 
   // --- SCROLL LOGIC ---
-  ngAfterViewInit() { this.checkScroll(); }
-  onScroll() { this.checkScroll(); }
+  ngAfterViewInit() { 
+    setTimeout(() => this.checkScroll(), 100);
+  }
+  
+  onScroll() { 
+    this.checkScroll();
+  }
 
   checkScroll() {
     const el = this.tableContainer()?.nativeElement;
@@ -153,9 +248,36 @@ private fetchOrders() {
       this.canScrollRight.set(el.scrollLeft < (el.scrollWidth - el.clientWidth - 5));
     }
   }
-
+  
   scrollTable(offset: number) {
     this.tableContainer()?.nativeElement.scrollBy({ left: offset, behavior: 'smooth' });
   }
 
+  private scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  onItemsPerPageChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.itemsPerPage.set(Number(select.value));
+    this.currentPage.set(1); // Retour à la première page
+  }
+
+  // Méthode pour formater le statut pour les classes CSS
+  getStatusClass(status: string | undefined): string {
+    if (!status) return '';
+    
+    const statusMap: { [key: string]: string } = {
+      'en attente': 'en-attente',
+      'en cours': 'enCours',
+      'en livraison': 'enCours',
+      'livré': 'livré',
+      'annulé': 'Annulé',
+      'terminé': 'livré',
+      'retourné': 'Annulé'
+    };
+    
+    return statusMap[status.toLowerCase()] || 
+           status.toLowerCase().replace(/\s+/g, '-');
+  }
 }

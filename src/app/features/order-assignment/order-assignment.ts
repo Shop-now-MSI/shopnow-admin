@@ -1,4 +1,5 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
+// src/app/components/order-assignment.component.ts (complet)
+import { Component, signal, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, ChevronLeft, User, ArrowRight, Save } from 'lucide-angular';
@@ -7,6 +8,8 @@ import { OrderService } from '../../services/order.service';
 import { LivreurService } from '../../services/livreur.service';
 import { Livreur } from '../../shared/interfaces/livreur.interface';
 import { Order } from '../../shared/interfaces/order.interface';
+import { Observable } from 'rxjs/internal/Observable';
+import { ToastService } from '../../services/toast.service'; // Nouvel import
 
 @Component({
   selector: 'app-order-assignment',
@@ -22,17 +25,22 @@ export class OrderAssignment implements OnInit {
   readonly arrowRight = ArrowRight;
 
   // Data
-  order = signal<any>(null);
+  order = signal<Order | null>(null);
   availableCouriers = signal<Livreur[]>([]);
-  selectedCourierId = signal<number | string>('');
-  description = '';
+  selectedCourierId = signal<number | null>(null);
+  description = signal('');
   isLoading = signal(true);
-  error = signal<string | null>(null);
-  currentAssignmentId = signal<string | null>(null);
+  currentLivraisonId = signal<string | null>(null);
+
+  // Flag pour savoir si déjà assigné
+  isAssigned = computed(() => !!this.order()?.livraison);
+
+  // Inject ToastService
+  private toastService = inject(ToastService);
 
   constructor(
     private orderService: OrderService,
-    private LivreurService: LivreurService,
+    private livreurService: LivreurService,
     private route: ActivatedRoute
   ) {}
 
@@ -48,106 +56,115 @@ export class OrderAssignment implements OnInit {
     this.isLoading.set(true);
     this.orderService.getById(orderId).subscribe({
       next: (order) => {
-        this.order.set(this.mapOrderData(order));
+        this.order.set(order);
+        this.description.set(order.notes || '');
+        if (order.livraison) {
+          this.currentLivraisonId.set(order.livraison.id);
+          this.selectedCourierId.set(order.livraison.livreur_id);
+        }
         this.isLoading.set(false);
+        this.toastService.success('Détails de la commande chargés avec succès');
       },
       error: (err) => {
-        this.error.set('Failed to load order details');
         this.isLoading.set(false);
+        this.toastService.error('Échec du chargement des détails de la commande');
+        console.error('Erreur:', err);
       }
     });
   }
 
-  //getAvailableCoursiers
   loadAvailableCouriers() {
-    this.LivreurService.getAll().subscribe({
-      next: (couriers) => this.availableCouriers.set(couriers),
-      error: (err) => console.error('Error loading couriers:', err)
+    this.livreurService.getAll().subscribe({
+      next: (couriers) => {
+        this.availableCouriers.set(couriers);
+        if (couriers.length > 0) {
+          this.toastService.info(`${couriers.length} livreurs disponibles`);
+        } else {
+          this.toastService.warning('Aucun livreur disponible');
+        }
+      },
+      error: (err) => {
+        console.error('Erreur chargement livreurs:', err);
+        this.toastService.error('Échec du chargement des livreurs');
+      }
     });
   }
 
-  mapOrderData(order: any) {
-    return {
-      id: order.id,
-      date: new Date(order.date).toLocaleDateString(),
-      clientName: `${order.user.firstname} ${order.user.name}`,
-      clientEmail: order.user.email,
-      zip: order.zip,
-      clientAvatar: `https://i.pravatar.cc/150?u=${order.user.id}`,
-      deliveryAddress: `${order.address}, ${order.zip} ${order.city}`,
-      products: order.order_items.map((item: any) => ({
-        name: item.product.name,
-        brand: item.product.brand,
-        quantity: item.quantite,
-        price: parseFloat(item.product.price)
-      })),
-      total: parseFloat(order.total),
-      paymentMethod: order.payment_method,
-      notes: order.notes,
-      deliveryStatus: this.mapDeliveryStatus(order.delivery_status)
-    };
-  }
-
-  mapDeliveryStatus(status: string) {
-    const statusMap: {[key: string]: string} = {
-      'en attente': 'En attente',
-      'en cours': 'En cours',
-      'livré': 'Livré',
-      'annulé': 'Annulé'
-    };
-    return statusMap[status] || status;
-  }
-
-  onCourierChange(event: Event) {
-    const val = (event.target as HTMLSelectElement).value;
-    this.selectedCourierId.set(val);
-  }
-
-acceptAssignment() {
-  if (!this.selectedCourierId()) {
-    this.error.set('Veuillez sélectionner un livreur');
-    return;
-  }
-
-  const request = {
-    idCommande: this.order().id,
-    idLivreur: Number(this.selectedCourierId())
-  };
-
-  this.orderService.assignLivreur(request).subscribe({
-    next: (response) => {
-      // Mettre à jour l'interface avec les données de la réponse
-      this.order.update(order => ({
-        ...order,
-        deliveryStatus: response.order_status,
-        livraison: response.livraison
-      }));
-      this.currentAssignmentId.set(response.livraison.id);
-      // Optionnel: afficher un message de succès
-    },
-    error: (err) => {
-      this.error.set('Échec de l\'assignation du livreur');
-      console.error('Erreur:', err);
+  saveAssignment() {
+    if (!this.selectedCourierId()) {
+      this.toastService.warning('Veuillez sélectionner un livreur', 3000);
+      return;
     }
-  });
-}
 
+    const request = {
+      idCommande: this.order()!.id,
+      idLivreur: this.selectedCourierId()!
+    };
+
+    let observable: Observable<any>;
+    if (this.isAssigned()) {
+      observable = this.orderService.updateAssignation({
+        ...request,
+        idLivraison: this.currentLivraisonId()!
+      });
+    } else {
+      observable = this.orderService.assignLivreur(request);
+    }
+
+    observable.subscribe({
+      next: (response) => {
+        this.order.update((currentOrder) => {
+          if (currentOrder) {
+            return {
+              ...currentOrder,
+              delivery_status: response.livraison.status || currentOrder.delivery_status,
+              livraison: response.livraison
+            };
+          }
+          return currentOrder;
+        });
+        this.currentLivraisonId.set(response.livraison.id);
+        
+        if (this.isAssigned()) {
+          this.toastService.success('Assignation mise à jour avec succès');
+        } else {
+          this.toastService.success('Livreur assigné avec succès');
+        }
+      },
+      error: (err) => {
+        this.toastService.error('Échec de l\'assignation/mise à jour du livreur');
+        console.error('Erreur:', err);
+      }
+    });
+  }
 
   rejectAssignment() {
-    // Logique pour annuler l'assignation
-    if (this.currentAssignmentId()) {
-      this.orderService.cancel(this.order().id).subscribe({
-        next: () => {
-          this.currentAssignmentId.set(null);
-          this.selectedCourierId.set('');
-          this.description = '';
-        },
-        error: (err) => {
-          this.error.set('Échec de l\'annulation');
-          console.error('Erreur:', err);
-        }
-      });
+    if (!this.currentLivraisonId()) {
+      this.toastService.warning('Aucune assignation à annuler', 3000);
+      return;
     }
-  }
 
+    const request = { idCommande: this.order()!.id };
+    this.orderService.cancel(request).subscribe({
+      next: () => {
+        this.order.update((currentOrder) => {
+          if (currentOrder) {
+            return {
+              ...currentOrder,
+              delivery_status: 'annulé',
+            };
+          }
+          return currentOrder;
+        });
+        // this.currentLivraisonId.set(null);
+        // this.selectedCourierId.set(null);
+        // this.description.set('');
+        this.toastService.success('Assignation annulée avec succès');
+      },
+      error: (err) => {
+        this.toastService.error('Échec de l\'annulation');
+        console.error('Erreur:', err);
+      }
+    });
+  }
 }

@@ -3,8 +3,7 @@ export interface User {
   name: string;
   firstname: string;
   email: string;
-  // Ajoute d'autres champs si nécessaires, comme role (admin/livreur), created_at, etc.
-  // password n'est pas retourné, donc pas inclus ici
+  type: string;
 }
 
 export interface LoginResponse {

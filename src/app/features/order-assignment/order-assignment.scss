@@ -222,3 +222,39 @@ label{
     color: var(--text-main);
   }
 }
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: capitalize;
+
+  // Styles par statut
+  &.en-attente {
+    background: #ffeab0;
+    color: #b78103;
+  }
+  &.enCours {
+    background: #bfdbfe;
+    color: #1d4ed8;
+  }
+  &.livré {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  &.Annulé {
+    background: #fecaca;
+    color: #b91c1c;
+  }
+}

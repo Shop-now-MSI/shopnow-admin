@@ -228,3 +228,27 @@ button {
     align-items: flex-start;
   }
 }
+
+/* Ajouter ces styles pour les champs requis */
+.required {
+  color: #ef4444;
+  margin-left: 4px;
+}
+
+/* Styles pour les boutons désactivés */
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Style pour les champs en erreur */
+.form-group input.ng-invalid.ng-touched,
+.form-group select.ng-invalid.ng-touched {
+  border-color: #ef4444;
+}
+
+.form-group input.ng-valid.ng-touched,
+.form-group select.ng-valid.ng-touched {
+  border-color: #10b981;
+}

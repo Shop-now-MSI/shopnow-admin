@@ -10,6 +10,7 @@ import { CoursierDetails } from './features/coursier-details/coursier-details';
 import { OrderTracking } from './features/order-tracking/order-tracking';
 // app.routes.ts
 import { authGuard } from '../app/services/auth.guard';
+import { DeliveryMapComponent } from './shared/delivery-map';
 
 export const routes: Routes = [
   {
@@ -37,5 +38,9 @@ export const routes: Routes = [
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
+  },
+    { 
+    path: 'delivery-tracking', 
+    component: DeliveryMapComponent 
   },
 ];

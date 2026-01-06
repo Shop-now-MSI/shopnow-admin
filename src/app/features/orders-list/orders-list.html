@@ -4,30 +4,79 @@
       <h1>Gestion des Commandes</h1>
       <p>Suivez les expéditions et gérez les demandes clients</p>
     </div>
+    
+    <!-- Affichage des compteurs de statuts -->
+    <div class="header-right">
+      <div class="stats-summary">
+        <span class="stat-total">Total: {{ allOrders().length }}</span>
+        @for (status of statusOptions(); track status.value) {
+          @if (status.value && statusCounts()[status.value] > 0) {
+            <span class="stat-item status-{{ getStatusClass(status.value) }}">
+              {{ status.label }}: {{ statusCounts()[status.value] }}
+            </span>
+          }
+        }
+      </div>
+    </div>
   </header>
 
+  <!-- Barre de filtres améliorée -->
   <section class="filters-bar">
     <div class="filters-group">
-      <select class="select-filter">
-        <option>Statut: Tous</option>
-        <option>En attente</option>
-        <option>En cours</option>
-        <option>Livré</option>
-      </select>
-
-      <select class="select-filter">
-        <option>Période: Ce mois</option>
-        <option>Cette semaine</option>
-        <option>Aujourd'hui</option>
-      </select>
+      <!-- Filtre par statut -->
+      <div class="filter-group">
+        <label class="filter-label">Statut</label>
+        <select class="select-filter" (change)="onStatusChange($event)" [value]="selectedStatus()">
+          @for (status of statusOptions(); track status.value) {
+            <option [value]="status.value">{{ status.label }}</option>
+          }
+        </select>
+      </div>
+    <!-- Recherche -->
+    <div class="filter-group">
+      <label class="filter-label">Rechercher</label>
+      <input type="text" 
+              class="search-input" 
+              placeholder="Client, adresse, ID..."
+              [value]="searchQuery()"
+              (input)="onSearchChange($event)">
     </div>
-
-    <button class="btn-clear">
-      <lucide-icon [img]="trash"></lucide-icon>
-      Effacer tout
-    </button>
+      <!-- Filtre par période (optionnel) -->
+      <!-- <div class="filter-group">
+        <label class="filter-label">Période</label>
+        <select class="select-filter" (change)="onPeriodChange($event)" [value]="selectedPeriod()">
+          <option value="">Toutes les périodes</option>
+          <option value="today">Aujourd'hui</option>
+          <option value="week">Cette semaine</option>
+          <option value="month">Ce mois</option>
+          <option value="year">Cette année</option>
+        </select>
+      </div> -->
+    </div>
+    <!-- Boutons d'action -->
+    <div class="filter-actions">
+      <button class="btn-clear" (click)="clearFilters()" [disabled]="!selectedStatus() && !selectedPeriod() && !searchQuery()">
+        <lucide-icon [img]="trash"></lucide-icon>
+        Effacer les filtres
+      </button>
+      
+      <!-- @if (selectedStatus() || selectedPeriod() || searchQuery()) {
+        <span class="filter-info">
+          {{ filteredOrders().length }} résultat{{ filteredOrders().length !== 1 ? 's' : '' }}
+        </span>
+      } -->
+    </div>
   </section>
 
+  <!-- Indicateur de chargement -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>Chargement des commandes...</p>
+    </div>
+  }
+
+  <!-- Tableau des commandes -->
   <div class="table-wrapper">
     @if (canScrollLeft()) {
       <button class="scroll-btn left" (click)="scrollTable(-200)">
@@ -57,81 +106,116 @@
           </tr>
         </thead>
         <tbody>
-          @for (order of paginatedOrders(); track order.id) {
-            <tr class="table-row" >
-              <td><span class="text-muted">#{{ order.trackingId }}</span></td>
-
-              <td>
-                <div class="user-cell">
-                  <img [src]="order.clientAvatar" alt="" class="user-avatar">
-                  <div>
-                    <span class="user-name">{{ order.clientName }}</span>
-                    <span class="user-email">{{ order.clientEmail }}</span>
-                  </div>
-                </div>
-              </td>
-
-              <td>{{ order.deliveryAddress }}</td>
-              <td>{{ order.city }}</td>
-
-              <td class="text-muted">{{ order.date }}</td>
-
-              <td><strong class="highlight">{{ order.amount }} €</strong></td>
-
-              <td>
-                <span class="status-badge" [class]="order.paymentStatus">
-                  {{ order.paymentStatus === 'paid' ? 'Payé' : 'En attente' }}
-                </span>
-              </td>
-
-              <td>
-                <span class="status-badge" [class]="order.status">
-                  @switch (order.status) {
-                    @case ('pending') { En attente }
-                    @case ('transit') { En transit }
-                    @case ('delivered') { Livré }
-                    @case ('cancelled') { Annulé }
-                  }
-                </span>
-              </td>
-
-              <td>{{ order.notes }}</td>
-              <td>
-                <button class="icon-btn" title="Details" routerLink="/admin/order-assignment/{{ order.id }}">
-                  <lucide-icon [img]="eye"></lucide-icon>
-                </button>
-                <br>
-                <button class="icon-btn" title="Suivre" routerLink="/admin/order-tracking">
-                  <lucide-icon [img]="ArrowBigRightDash"></lucide-icon>
-                </button>
+          @if (filteredOrders().length === 0) {
+            <tr>
+              <td colspan="10" class="empty-state">
+                @if (selectedStatus() || searchQuery()) {
+                  <p>Aucune commande ne correspond à vos filtres</p>
+                  <button class="btn-text" (click)="clearFilters()">Effacer les filtres</button>
+                } @else {
+                  <p>Aucune commande disponible</p>
+                }
               </td>
             </tr>
-          } @empty {
-            <tr><td colspan="9" style="text-align:center; padding: 20px;">Aucune commande trouvée</td></tr>
+          } @else {
+            @for (order of paginatedOrders(); track order.id) {
+              <tr class="table-row">
+                <td><span class="text-muted">#{{ order.id }}</span></td>
+
+                <td>
+                  <div class="user-cell">
+                    <img [src]="'https://i.pravatar.cc/150?u=' + order.user.id" alt="" class="user-avatar">
+                    <div>
+                      <span class="user-name">{{ order.user.firstname }} {{ order.user.name }}</span>
+                      <span class="user-email">{{ order.user.email }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <td>{{ order.address }}</td>
+                <td>{{ order.city }}</td>
+
+                <td class="text-muted">{{ order.created_at | date:'dd/MM/yyyy' }}</td>
+
+                <td><strong class="highlight">{{ order.total | number:'1.2-2' }} €</strong></td>
+
+                <td>
+                  <span class="payment-badge" [class]="order.payment_method!.toLowerCase()">
+                    {{ order.payment_method | titlecase }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="status-badge" [ngClass]="{
+                    'en-attente': order?.delivery_status?.toLowerCase() === 'en attente',
+                    'enCours': order?.delivery_status?.toLowerCase() === 'en cours' || 
+                                order?.delivery_status?.toLowerCase() === 'en livraison',
+                    'livré': order?.delivery_status?.toLowerCase() === 'livré',
+                    'Annulé': order?.delivery_status?.toLowerCase() === 'annulé'
+                  }">
+                    {{ order.delivery_status | titlecase }}
+                  </span>
+                </td>
+
+                <td><span class="note">{{ order.notes || '—' }}</span></td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="icon-btn" title="Détails" routerLink="/admin/order-assignment/{{ order.id }}">
+                      <lucide-icon [img]="eye"></lucide-icon>
+                    </button>
+                    <button class="icon-btn" title="Suivre" routerLink="/admin/order-tracking">
+                      <lucide-icon [img]="ArrowBigRightDash"></lucide-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>
     </div>
   </div>
 
-  <footer class="pagination">
-    <span class="page-info">{{ paginationInfo() }}</span>
-    <div class="page-controls">
-      <button class="page-btn" [disabled]="currentPage() === 1" (click)="prevPage()">
-        <lucide-icon [img]="chevronLeft"></lucide-icon>
-      </button>
-
-      @for (page of pagesArray(); track page) {
-        <button class="page-btn"
-                [class.active]="currentPage() === page"
-                (click)="goToPage(page)">
-          {{ page }}
+  <!-- Pagination -->
+  @if (filteredOrders().length > 0) {
+    <footer class="pagination">
+      <div class="pagination-left">
+        <span class="page-info">{{ paginationInfo() }}</span>
+        
+        <!-- Sélection du nombre d'éléments par page -->
+        <div class="items-per-page">
+          <label>Afficher</label>
+          <select class="select-small" (change)="onItemsPerPageChange($event)">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>par page</span>
+        </div>
+      </div>
+      
+      <div class="page-controls">
+        <button class="page-btn" [disabled]="currentPage() === 1" (click)="prevPage()">
+          <lucide-icon [img]="chevronLeft"></lucide-icon>
         </button>
-      }
 
-      <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
-        <lucide-icon [img]="chevronRight"></lucide-icon>
-      </button>
-    </div>
-  </footer>
+        @for (page of pagesArray(); track page) {
+          @if (page === -1) {
+            <span class="page-ellipsis">...</span>
+          } @else {
+            <button class="page-btn"
+                    [class.active]="currentPage() === page"
+                    (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          }
+        }
+
+        <button class="page-btn" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+          <lucide-icon [img]="chevronRight"></lucide-icon>
+        </button>
+      </div>
+    </footer>
+  }
 </div>
