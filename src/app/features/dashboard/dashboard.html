@@ -1,84 +1,93 @@
-
 <div class="dashboard-wrapper">
   <!-- Header -->
   <header class="dashboard-header">
     <div class="header-left">
       <h1 class="main-title">Dashboard</h1>
-      <p class="subtitle">Suivi en temps réel de vos opérations</p>
+      <p class="subtitle">Real-time tracking of your operations</p>
     </div>
     <button class="filter-btn">
       <lucide-icon [img]="slidersHorizontal"></lucide-icon>
     </button>
   </header>
 
-  <!-- Stats Grid - DONNÉES EN TEMPS RÉEL -->
+  <!-- Stats Grid - REAL-TIME DATA -->
   <section class="stats-grid">
-    <!-- ✅ COMMANDES TOTALES -->
+    <!-- Total Orders -->
     <div class="stat-card">
       <div class="stat-gradient blue-gradient"></div>
       <div class="stat-content">
         <div class="stat-header">
           <div class="stat-icon blue-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16zm-9-9.236L18.618 8 12 11.236 5.382 8 12 6.764zM5 9.236L12 12.472 19 9.236V15.764L12 19l-7-3.236V9.236z"/>
-          </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16zm-9-9.236L18.618 8 12 11.236 5.382 8 12 6.764zM5 9.236L12 12.472 19 9.236V15.764L12 19l-7-3.236V9.236z"/>
+            </svg>
+          </div>
         </div>
-
-          
-        </div>
-        <p class="stat-label">Total Commandes</p>
+        <p class="stat-label">Total Orders</p>
         <p class="stat-value">{{ stats.totalOrders }}</p>
       </div>
     </div>
 
-    <!-- ✅ LIVRAISONS EN COURS -->
+    <!-- Pending Deliveries -->
+    <div class="stat-card">
+      <div class="stat-gradient yellow-gradient"></div>
+      <div class="stat-content">
+        <div class="stat-header">
+          <div class="stat-icon yellow-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+            </svg>
+          </div>
+        </div>
+        <p class="stat-label">Pending Deliveries</p>
+        <p class="stat-value">{{ stats.pendingDeliveries }}</p>
+      </div>
+    </div>
+
+    <!-- Active Deliveries -->
     <div class="stat-card">
       <div class="stat-gradient purple-gradient"></div>
       <div class="stat-content">
         <div class="stat-header">
           <div class="stat-icon purple-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 3h13v13H3V3zm16 7h2v6h-2v-6zm0-3h2v2h-2V7zm-3 0v6h-2V7h2zm0 9a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm-10 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/>
-          </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 3h13v13H3V3zm16 7h2v6h-2v-6zm0-3h2v2h-2V7zm-3 0v6h-2V7h2zm0 9a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm-10 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/>
+            </svg>
+          </div>
         </div>
-          
-        </div>
-        <p class="stat-label">Livraisons en Cours</p>
+        <p class="stat-label">In Progress</p>
         <p class="stat-value">{{ stats.activeDeliveries }}</p>
       </div>
     </div>
 
-    <!-- ✅ LIVRAISONS RÉUSSIES -->
+    <!-- Successful Deliveries -->
     <div class="stat-card">
       <div class="stat-gradient green-gradient"></div>
       <div class="stat-content">
         <div class="stat-header">
           <div class="stat-icon green-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M20.285 6.709l-11.025 11.025-5.545-5.545 1.414-1.414 4.131 4.131 9.611-9.611 1.414 1.414z"/>
-        </svg>
-      </div>
-                
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20.285 6.709l-11.025 11.025-5.545-5.545 1.414-1.414 4.131 4.131 9.611-9.611 1.414 1.414z"/>
+            </svg>
+          </div>
         </div>
-        <p class="stat-label">Livraisons Réussies</p>
+        <p class="stat-label">Successful</p>
         <p class="stat-value">{{ stats.successfulDeliveries }}</p>
       </div>
     </div>
 
-    <!-- ✅ LIVRAISONS ÉCHOUÉES -->
+    <!-- Failed Deliveries -->
     <div class="stat-card">
       <div class="stat-gradient orange-gradient"></div>
       <div class="stat-content">
         <div class="stat-header">
-          <!-- Croix (❌) -->
-      <div class="stat-icon orange-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M18.364 5.636l-1.414-1.414L12 9.172 7.05 4.222 5.636 5.636 10.586 10.586 5.636 15.536l1.414 1.414L12 12l4.95 4.95 1.414-1.414-4.95-4.95 4.95-4.95z"/>
-        </svg>
-      </div>
-          
+          <div class="stat-icon orange-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.364 5.636l-1.414-1.414L12 9.172 7.05 4.222 5.636 5.636 10.586 10.586 5.636 15.536l1.414 1.414L12 12l4.95 4.95 1.414-1.414-4.95-4.95 4.95-4.95z"/>
+            </svg>
+          </div>
         </div>
-        <p class="stat-label">Livraisons Échouées</p>
+        <p class="stat-label">Failed</p>
         <p class="stat-value">{{ stats.failedDeliveries }}</p>
       </div>
     </div>
@@ -115,9 +124,7 @@
               stroke-width="3" />
         <circle cx="400" cy="100" r="8" fill="#3b82f6" class="pulse-dot" />
       </svg>
-      <div class="chart-tooltip">{{ stats.totalOrders }} commandes</div>
-      <div class="chart-labels">
-      </div>
+      <div class="chart-tooltip">{{ stats.totalOrders }} orders</div>
     </div>
   </section>
 
@@ -134,7 +141,8 @@
           <div class="courier-card">
             <div class="courier-info">
               <div class="avatar-wrapper">
-                <img [src]="courier.avatar" class="courier-avatar">
+                <img [src]="courier.avatar" class="courier-avatar" *ngIf="courier.avatar">
+                <div class="avatar-placeholder" *ngIf="!courier.avatar">{{ courier.name.charAt(0) }}</div>
                 <div class="status-dot"></div>
               </div>
               <div class="courier-details">
@@ -159,7 +167,7 @@
               </div>
               <div class="progress-stats">
                 <span class="level-text">Level {{ courier.level }}</span>
-                <span class="points-text">{{ courier.deliveryCount }} Points</span>
+                <span class="points-text">{{ courier.deliveryCount }} Deliveries</span>
               </div>
             </div>
           </div>
@@ -182,58 +190,72 @@
             <span>100%</span>
           </div>
           
-<div class="status-bars">
-  <!-- Livraisons réussies -->
-  <div class="status-row">
-    <div class="bar-track">
-      <div class="bar-fill green-bar" [style.width.%]="percentSuccessful">
-        <div class="shimmer"></div>
-      </div>
-    </div>
-    <span class="bar-value">{{ percentSuccessful }}%</span>
-  </div>
+          <div class="status-bars">
+            <!-- Successful -->
+            <div class="status-row">
+              <div class="bar-track">
+                <div class="bar-fill green-bar" [style.width.%]="percentSuccessful">
+                  <div class="shimmer"></div>
+                </div>
+              </div>
+              <span class="bar-value">{{ percentSuccessful }}%</span>
+            </div>
 
-  <!-- Livraisons en cours -->
-  <div class="status-row">
-    <div class="bar-track">
-      <div class="bar-fill purple-bar" [style.width.%]="percentActive">
-        <div class="shimmer"></div>
-      </div>
-    </div>
-    <span class="bar-value">{{ percentActive }}%</span>
-  </div>
+            <!-- In Progress -->
+            <div class="status-row">
+              <div class="bar-track">
+                <div class="bar-fill purple-bar" [style.width.%]="percentActive">
+                  <div class="shimmer"></div>
+                </div>
+              </div>
+              <span class="bar-value">{{ percentActive }}%</span>
+            </div>
 
-  <!-- Livraisons échouées -->
-  <div class="status-row">
-    <div class="bar-track">
-      <div class="bar-fill orange-bar" [style.width.%]="percentFailed">
-        <div class="shimmer"></div>
-      </div>
-    </div>
-    <span class="bar-value">{{ percentFailed }}%</span>
-  </div>
-</div>
+            <!-- Pending -->
+            <div class="status-row">
+              <div class="bar-track">
+                <div class="bar-fill yellow-bar" [style.width.%]="percentPending">
+                  <div class="shimmer"></div>
+                </div>
+              </div>
+              <span class="bar-value">{{ percentPending }}%</span>
+            </div>
 
+            <!-- Failed -->
+            <div class="status-row">
+              <div class="bar-track">
+                <div class="bar-fill orange-bar" [style.width.%]="percentFailed">
+                  <div class="shimmer"></div>
+                </div>
+              </div>
+              <span class="bar-value">{{ percentFailed }}%</span>
+            </div>
+          </div>
         </div>
 
         <!-- Legend -->
         <div class="status-legend">
-  <div class="legend-item">
-    <div class="legend-dot green-dot"></div>
-    <span class="legend-label">Completed</span>
-    <span class="legend-value">{{ percentSuccessful }}%</span>
-  </div>
-  <div class="legend-item">
-    <div class="legend-dot purple-dot"></div>
-    <span class="legend-label">In Progress</span>
-    <span class="legend-value">{{ percentActive }}%</span>
-  </div>
-  <div class="legend-item">
-    <div class="legend-dot orange-dot"></div>
-    <span class="legend-label">Failed</span>
-    <span class="legend-value">{{ percentFailed }}%</span>
-  </div>
-</div>
+          <div class="legend-item">
+            <div class="legend-dot green-dot"></div>
+            <span class="legend-label">Successful</span>
+            <span class="legend-value">{{ percentSuccessful }}%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot purple-dot"></div>
+            <span class="legend-label">In Progress</span>
+            <span class="legend-value">{{ percentActive }}%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot yellow-dot"></div>
+            <span class="legend-label">Pending</span>
+            <span class="legend-value">{{ percentPending }}%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot orange-dot"></div>
+            <span class="legend-label">Failed</span>
+            <span class="legend-value">{{ percentFailed }}%</span>
+          </div>
+        </div>
       </div>
     </section>
   </div>

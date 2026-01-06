@@ -15,6 +15,7 @@ export class Dashboard {
 
   stats = {
     totalOrders: 0,
+    pendingDeliveries: 0,
     activeDeliveries: 0,
     successfulDeliveries: 0,
     failedDeliveries: 0
@@ -48,17 +49,18 @@ export class Dashboard {
 
     this.http.get<any[]>(`${this.apiUrl}/commandes`, { headers }).subscribe({
       next: (commandes) => {
-        console.log('📦 Commandes:', commandes);
+        console.log('📦 Orders:', commandes);
         
-        // Voir tous les statuts
-        const statuts = commandes.reduce((acc: any, c) => {
+        // Show all statuses
+        const statuses = commandes.reduce((acc: any, c) => {
           acc[c.delivery_status] = (acc[c.delivery_status] || 0) + 1;
           return acc;
         }, {});
-        console.log('📊 Statuts:', statuts);
+        console.log('📊 Statuses:', statuses);
         
         this.stats = {
           totalOrders: commandes.length,
+          pendingDeliveries: commandes.filter(c => c.delivery_status === 'en attente').length,
           activeDeliveries: commandes.filter(c => c.delivery_status === 'en cours').length,
           successfulDeliveries: commandes.filter(c => c.delivery_status === 'livré').length,
           failedDeliveries: commandes.filter(c => c.delivery_status === 'annulé').length
@@ -67,7 +69,7 @@ export class Dashboard {
         console.log('✅ Stats:', this.stats);
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('❌ Erreur:', err)
+      error: (err) => console.error('❌ Error:', err)
     });
   }
 
@@ -87,9 +89,9 @@ export class Dashboard {
           if (livreur?.user_id) {
             if (!livreursMap.has(livreur.user_id)) {
               livreursMap.set(livreur.user_id, {
-                name: livreur.user?.name || `Livreur ${livreur.user_id}`,
-                city: livreur.ville || 'Ville inconnue',
-                avatar: '', // ✅ PAS D'AVATAR
+                name: livreur.user?.name || `Courier ${livreur.user_id}`,
+                city: livreur.ville || 'Unknown city',
+                avatar: '',
                 level: Math.floor(Math.random() * 15) + 5,
                 deliveryCount: 0,
                 progress: 0,
@@ -108,20 +110,26 @@ export class Dashboard {
         
         if (this.couriers.length === 0) {
           this.couriers = [
-            { name: 'Aucun livreur', city: 'N/A', avatar: '', level: 1, deliveryCount: 0, progress: 0, color: '#8b949e', trend: '0%' }
+            { name: 'No courier', city: 'N/A', avatar: '', level: 1, deliveryCount: 0, progress: 0, color: '#8b949e', trend: '0%' }
           ];
         }
         
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('❌ Erreur:', err);
+        console.error('❌ Error:', err);
         this.couriers = [
-          { name: 'Livreur 1', city: 'Ville A', avatar: '', level: 10, deliveryCount: 20, progress: 75, color: '#10b981', trend: '+10%' },
-          { name: 'Livreur 2', city: 'Ville B', avatar: '', level: 8, deliveryCount: 15, progress: 50, color: '#3b82f6', trend: '+5%' }
+          { name: 'Courier 1', city: 'City A', avatar: '', level: 10, deliveryCount: 20, progress: 75, color: '#10b981', trend: '+10%' },
+          { name: 'Courier 2', city: 'City B', avatar: '', level: 8, deliveryCount: 15, progress: 50, color: '#3b82f6', trend: '+5%' }
         ];
       }
     });
+  }
+
+  get percentPending(): number {
+    return this.stats.totalOrders > 0
+      ? +(this.stats.pendingDeliveries / this.stats.totalOrders * 100).toFixed(2)
+      : 0;
   }
 
   get percentActive(): number {
