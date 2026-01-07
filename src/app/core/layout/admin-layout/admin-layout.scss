@@ -161,7 +161,8 @@
   padding: 10px 0;
   width: 200px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  z-index: 100;
+  z-index: 1000; // Plus haut que l'overlay
+  pointer-events: all; // S'assure que le popup capture les clics
 }
 
 .popup-content {
@@ -176,7 +177,13 @@
   padding: 10px 15px;
   color: var(--text-gray);
   transition: color 0.2s ease;
-
+  cursor: pointer;           
+  background: none;          
+  border: none;              
+  width: 100%;              
+  text-align: left;          
+  font: inherit;             
+  
   &:hover {
     color: white;
     background-color: rgba(255, 255, 255, 0.1);
@@ -220,6 +227,7 @@
   bottom: 0;
   z-index: 99;
   background: transparent;
+  pointer-events: all; 
 }
 
 /* ... (autres styles existants) */

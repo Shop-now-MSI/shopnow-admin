@@ -4,11 +4,11 @@ import { LoginComponent } from './core/layout/login-layout/login-layout';
 import { Dashboard } from './features/dashboard/dashboard';
 import { CouriersList } from './features/couriers-list/couriers-list';
 import { CourierForm } from './features/courier-form/courier-form';
-import { OrderAssignment} from './features/order-assignment/order-assignment';
+import { OrderAssignment } from './features/order-assignment/order-assignment';
 import { OrdersList } from './features/orders-list/orders-list';
 import { CoursierDetails } from './features/coursier-details/coursier-details';
 import { OrderTracking } from './features/order-tracking/order-tracking';
-// app.routes.ts
+import { ProfileComponent } from './features/profile/profile.component'; 
 import { authGuard } from '../app/services/auth.guard';
 import { DeliveryMapComponent } from './shared/delivery-map';
 
@@ -31,6 +31,7 @@ export const routes: Routes = [
       { path: 'orders-list', component: OrdersList },
       { path: 'coursier-details', component: CoursierDetails },
       { path: 'order-tracking', component: OrderTracking },
+      { path: 'profile', component: ProfileComponent },  
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
@@ -39,7 +40,7 @@ export const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
-    { 
+  { 
     path: 'delivery-tracking', 
     component: DeliveryMapComponent 
   },

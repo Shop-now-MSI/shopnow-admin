@@ -1,0 +1,159 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <button class="back-btn" (click)="goBack()">
+      <lucide-icon [img]="arrowLeftIcon"></lucide-icon>
+      Retour
+    </button>
+    <h1>Gérer mon profil</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Chargement...</p>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="alert alert-success">
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="profile-card">
+    <div class="card-header">
+      <div class="avatar-section">
+        <img 
+          [src]="'https://ui-avatars.com/api/?name=' + (adminProfile()?.name || 'Admin') + '&background=random&size=100'" 
+          alt="Profile" 
+          class="profile-avatar"
+        >
+        <div class="profile-info-header">
+          <h2>{{ adminProfile()?.name }}</h2>
+          <span class="role-badge">{{ adminProfile()?.role || 'Admin' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+      <div class="form-section">
+        <h3>Informations personnelles</h3>
+        
+        <div class="form-group">
+          <label for="name">
+            <lucide-icon [img]="userIcon"></lucide-icon>
+            Nom complet
+          </label>
+          <input 
+            type="text" 
+            id="name" 
+            formControlName="name"
+            placeholder="Votre nom complet"
+            [class.error]="profileForm.get('name')?.invalid && profileForm.get('name')?.touched"
+          >
+          @if (profileForm.get('name')?.invalid && profileForm.get('name')?.touched) {
+            <span class="error-message">{{ getErrorMessage('name') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="email">
+            <lucide-icon [img]="mailIcon"></lucide-icon>
+            Email
+          </label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email"
+            placeholder="votre@email.com"
+            [class.error]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+          >
+          @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+            <span class="error-message">{{ getErrorMessage('email') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="phone">
+            <lucide-icon [img]="phoneIcon"></lucide-icon>
+            Téléphone (optionnel)
+          </label>
+          <input 
+            type="tel" 
+            id="phone" 
+            formControlName="phone"
+            placeholder="+237 6XX XXX XXX"
+          >
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <h3>Sécurité</h3>
+          <button 
+            type="button" 
+            class="toggle-password-btn"
+            (click)="togglePasswordFields()"
+          >
+            {{ showPasswordFields() ? 'Annuler' : 'Changer le mot de passe' }}
+          </button>
+        </div>
+
+        @if (showPasswordFields()) {
+          <div class="password-fields">
+            <div class="form-group">
+              <label for="password">
+                <lucide-icon [img]="lockIcon"></lucide-icon>
+                Nouveau mot de passe
+              </label>
+              <input 
+                type="password" 
+                id="password" 
+                formControlName="password"
+                placeholder="Minimum 8 caractères"
+                [class.error]="profileForm.get('password')?.invalid && profileForm.get('password')?.touched"
+              >
+              @if (profileForm.get('password')?.invalid && profileForm.get('password')?.touched) {
+                <span class="error-message">{{ getErrorMessage('password') }}</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="password_confirmation">
+                <lucide-icon [img]="lockIcon"></lucide-icon>
+                Confirmer le mot de passe
+              </label>
+              <input 
+                type="password" 
+                id="password_confirmation" 
+                formControlName="password_confirmation"
+                placeholder="Confirmer le mot de passe"
+                [class.error]="profileForm.hasError('passwordMismatch') && profileForm.get('password_confirmation')?.touched"
+              >
+              @if (profileForm.hasError('passwordMismatch') && profileForm.get('password_confirmation')?.touched) {
+                <span class="error-message">{{ getErrorMessage('password_confirmation') }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="submit-btn"
+          [disabled]="profileForm.invalid || loading()"
+        >
+          <lucide-icon [img]="saveIcon"></lucide-icon>
+          {{ loading() ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

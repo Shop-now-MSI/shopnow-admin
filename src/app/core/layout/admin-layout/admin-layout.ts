@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { 
   LayoutDashboard, 
   Box, 
@@ -21,11 +21,13 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./admin-layout.scss'],
 })
 export class AdminLayoutComponent {
-
   // Profile popup state
   showProfilePopup = signal(false);
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   toggleProfilePopup(event: MouseEvent) {
     event.stopPropagation();
@@ -34,6 +36,12 @@ export class AdminLayoutComponent {
 
   closeProfilePopup() {
     this.showProfilePopup.set(false);
+  }
+
+  goToProfile(event: MouseEvent) {
+    event.stopPropagation();
+    this.closeProfilePopup();
+    this.router.navigate(['/admin/profile']);
   }
 
   logout(event: MouseEvent) {
@@ -47,11 +55,11 @@ export class AdminLayoutComponent {
       }
     });
   }
-  
+
   layoutDashboard = LayoutDashboard;
   readonly box = Box;
   readonly users = Users;
-  readonly truck = Truck
+  readonly truck = Truck;
   readonly settings = Settings;
   readonly bell = Bell;
   readonly user = User;

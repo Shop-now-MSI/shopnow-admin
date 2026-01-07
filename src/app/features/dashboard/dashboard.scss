@@ -133,11 +133,11 @@ $text-secondary: #8b949e;
   }
 
   .stat-value {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0;
-  color: #ffffff !important;  // ← Force en blanc
-}
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: $text-primary;
+  }
 }
 
 // Chart Card

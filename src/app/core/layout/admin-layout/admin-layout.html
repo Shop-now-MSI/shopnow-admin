@@ -1,69 +1,48 @@
 <div class="admin-wrapper">
   <aside class="sidebar">
-    <div class="notif">
-      <button class="btn-add">
-        <lucide-icon [img]="bell"></lucide-icon>
-      </button>
-    </div>
-
-    <nav class="nav-icons">
-      <a routerLink="/admin/dashboard" routerLinkActive="active" title="Dashboard">
-        <lucide-icon [img]="layoutDashboard"></lucide-icon>
-      </a>
-      <a routerLink="/admin/orders-list" routerLinkActive="active" title="Livraisons">
-        <lucide-icon [img]="truck"></lucide-icon>
-      </a>
-      <a routerLink="/admin/couriers-list" routerLinkActive="active" title="Livreurs">
-        <lucide-icon [img]="users"></lucide-icon>
-      </a>
-      <a routerLink="/admin/settings" routerLinkActive="active" title="Paramètres">
-        <lucide-icon [img]="settings"></lucide-icon>
-      </a>
-    </nav>
-
-    <div class="profile-section" (click)="toggleProfilePopup($event)">
-      <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Profile" class="avatar">
-    </div>
-     <!-- Profile Popup -->
-      
+<div class="notif">
+<button class="btn-add">
+<lucide-icon [img]="bell"></lucide-icon>
+</button>
+</div>
+<nav class="nav-icons">
+<a routerLink="/admin/dashboard" routerLinkActive="active" title="Dashboard">
+<lucide-icon [img]="layoutDashboard"></lucide-icon>
+</a>
+<a routerLink="/admin/orders-list" routerLinkActive="active" title="Livraisons">
+<lucide-icon [img]="truck"></lucide-icon>
+</a>
+<a routerLink="/admin/couriers-list" routerLinkActive="active" title="Livreurs">
+<lucide-icon [img]="users"></lucide-icon>
+</a>
+<a routerLink="/admin/settings" routerLinkActive="active" title="Paramètres">
+<lucide-icon [img]="settings"></lucide-icon>
+</a>
+</nav>
+<div class="profile-section" (click)="toggleProfilePopup($event)">
+<img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Profile" class="avatar">
+</div>
+<!-- Profile Popup -->
     @if (showProfilePopup()) {
-      <div class="overlay" (click)="closeProfilePopup()"></div>
-      <div class="profile-popup">
-        <div class="popup-content">
-          <div class="profile-info">
-            <lucide-icon [img]="user" class="user-icon"></lucide-icon>
-            <span>Gérer mon profil</span>
-          </div>
-          <div class="divider"></div>
-          <button class="logout-btn" (click)="logout($event)">
-            <lucide-icon [img]="logOut" class="logout-icon"></lucide-icon>
+<div class="overlay" (click)="closeProfilePopup()"></div>
+<div class="profile-popup">
+<div class="popup-content">
+<button class="profile-info" (click)="goToProfile($event)">
+<lucide-icon [img]="user" class="user-icon"></lucide-icon>
+<span>Gérer mon profil</span>
+</button>
+<div class="divider"></div>
+<button class="logout-btn" (click)="logout($event)">
+<lucide-icon [img]="logOut" class="logout-icon"></lucide-icon>
             Se déconnecter
-          </button>
-        </div>
-      </div>
+</button>
+</div>
+</div>
     }
-  </aside>
-
-  <main class="main-container">
-    <section class="dynamic-content">
-      <router-outlet></router-outlet>
-    </section>
-
-    <!-- <aside class="right-panel">
-      <div class="panel-header">
-        <h2>Personal</h2>
-        <a href="#" class="learn-more">Learn more</a>
-      </div>
-
-      <div class="widgets-container">
-        <div class="widget-slot">
-          <div class="placeholder-widget">Composant 1 (ex: My Card)</div>
-        </div>
-
-        <div class="widget-slot">
-          <div class="placeholder-widget">Composant 2 (ex: Calendar)</div>
-        </div>
-      </div>
-    </aside> -->
-  </main>
+</aside>
+<main class="main-container">
+<section class="dynamic-content">
+<router-outlet></router-outlet>
+</section>
+</main>
 </div>
