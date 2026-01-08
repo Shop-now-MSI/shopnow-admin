@@ -2,6 +2,14 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { SlidersHorizontal, LucideAngularModule, EllipsisVertical } from 'lucide-angular/src/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { 
+  Package, 
+  Clock, 
+  Truck, 
+  CheckCircle, 
+  XCircle,
+  MoreVertical,
+} from 'lucide-angular';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,8 +19,13 @@ import { CommonModule } from '@angular/common';
 })
 export class Dashboard {
   slidersHorizontal = SlidersHorizontal;
-  moreVertical = EllipsisVertical;
-
+ 
+  readonly packageIcon = Package;
+  readonly clockIcon = Clock;
+  readonly truckIcon = Truck;
+  readonly checkCircleIcon = CheckCircle;
+  readonly xCircleIcon = XCircle;
+  readonly moreVertical = MoreVertical;
   stats = {
     totalOrders: 0,
     pendingDeliveries: 0,
