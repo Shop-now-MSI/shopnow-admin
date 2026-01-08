@@ -71,8 +71,8 @@ export class CourierForm {
     this.livreurService.getById(id).subscribe({
       next: (livreur: Livreur) => {
         this.courier.set({
-          firstname: livreur.firstname,
-          name: livreur.name,
+          firstname: livreur.user.firstname,
+          name: livreur.user.name,
           email: livreur.user.email,
           password: '',
           tel: livreur.tel,

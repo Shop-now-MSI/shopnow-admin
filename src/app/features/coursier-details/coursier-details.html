@@ -17,7 +17,7 @@
         <div class="profile-main">
           <img [src]="courier()?.photo || 'https://i.pravatar.cc/150?u=' + courier()?.user_id" alt="Avatar" class="courier-avatar">
           <div class="profile-info">
-            <h2>{{ courier()?.firstname }} {{ courier()?.name }}</h2>
+            <h2>{{ courier()?.user!.firstname }} {{ courier()?.user!.name }}</h2>
             <span class="status-badge active">Actif</span>
           </div>
         </div>

@@ -53,22 +53,22 @@ export class CouriersList implements AfterViewInit, OnInit {
 
     return this.allCouriers().filter(courier => {
       return (
-        courier.firstname?.toLowerCase().includes(query) ||
-        courier.name?.toLowerCase().includes(query) ||
+        courier.user.firstname?.toLowerCase().includes(query) ||
+        courier.user.name?.toLowerCase().includes(query) ||
         courier.user?.email?.toLowerCase().includes(query) ||
         courier.tel?.toLowerCase().includes(query) ||
         courier.zoneActivite?.toLowerCase().includes(query) ||
         courier.typeVehicule?.toLowerCase().includes(query) ||
         courier.typeContrat?.toLowerCase().includes(query) ||
         courier.matricule?.toLowerCase().includes(query) ||
-        `${courier.firstname} ${courier.name}`.toLowerCase().includes(query)
+        `${courier.user.firstname} ${courier.user.name}`.toLowerCase().includes(query)
       );
     });
   });
 
   // --- GESTION DE LA PAGINATION ---
   currentPage = signal(1);
-  itemsPerPage = signal(10);
+  itemsPerPage = signal(5);
 
   // Nombre total de pages
   totalPages = computed(() => Math.ceil(this.filteredCouriers().length / this.itemsPerPage()));

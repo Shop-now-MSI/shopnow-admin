@@ -1,112 +1,192 @@
-import { Component, AfterViewInit, Input } from '@angular/core';
+import {
+  Component,
+  AfterViewInit,
+  Input,
+  Output,
+  EventEmitter,
+  ElementRef,
+  ViewChild,
+  OnDestroy
+} from '@angular/core';
 import * as L from 'leaflet';
-import { icon, Marker } from 'leaflet';
-import { HttpClient } from '@angular/common/http';
 
-// Fix pour les icônes Leaflet (problème connu)
-const iconRetinaUrl = 'assets/marker-icon-2x.png';
-const iconUrl = 'assets/marker-icon.png';
-const shadowUrl = 'assets/marker-shadow.png';
-const iconDefault = icon({
-  iconRetinaUrl,
-  iconUrl,
-  shadowUrl,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  tooltipAnchor: [16, -28],
-  shadowSize: [41, 41]
+// Fix icônes Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'assets/leaflet/marker-icon-2x.png',
+  iconUrl: 'assets/leaflet/marker-icon.png',
+  shadowUrl: 'assets/leaflet/marker-shadow.png',
 });
-Marker.prototype.options.icon = iconDefault;
 
 @Component({
   selector: 'app-map',
-    standalone: true,
-  imports: [],
-  templateUrl: './map.html',
-  styleUrl: './map.scss',
+  standalone: true,
+  template: `
+    <div class="map-wrapper">
+      <div #mapContainer class="map-container"></div>
+
+      @if(showControls){
+        <div class="map-controls">
+          <button (click)="zoomIn()" title="Zoom +">+</button>
+          <button (click)="zoomOut()" title="Zoom -">−</button>
+          <button (click)="resetView()" title="Reset">⟳</button>
+        </div>
+      }
+    </div>
+  `,
+  styles: [`
+    .map-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+    }
+
+    .map-controls {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 1000;
+    }
+
+    .map-controls button {
+      width: 40px;
+      height: 36px;
+      border-radius: 6px;
+      background: #fff;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  `]
 })
-export class Map {
-  private map: L.Map | null = null;
-  private markers: L.Marker[] = [];
+export class MapComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef;
 
-  @Input() center: [number, number] = [48.8566, 2.3522]; // Paris par défaut
-  @Input() zoom: number = 12;
-  @Input() showMarkers: boolean = true;
-  @Input() markerPositions: [number, number][] = [];
+  @Input() center: [number, number] = [48.8566, 2.3522];
+  @Input() zoom = 13;
+  @Input() showControls = true;
 
-  constructor(private http: HttpClient) {}
+  @Output() mapReady = new EventEmitter<L.Map>();
+
+  private map!: L.Map;
+  private markersLayer = L.layerGroup();
+  private customMarkers = new Map<string, L.Marker>();
+  private routesLayer = L.layerGroup();
+  private customRoutes = new Map<string, L.Polyline>();
 
   ngAfterViewInit(): void {
     this.initMap();
   }
 
   private initMap(): void {
-    this.map = L.map('map', {
+    this.map = L.map(this.mapContainer.nativeElement, {
       center: this.center,
       zoom: this.zoom,
-      attributionControl: false
+      zoomControl: false
     });
 
-    // Ajouter les tuiles OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
+      attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
-    // Ajouter le contrôle d'attribution
-    L.control.attribution({
-      position: 'bottomright'
-    }).addTo(this.map);
+    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
-    // Ajouter des marqueurs si demandé
-    if (this.showMarkers && this.markerPositions.length > 0) {
-      this.addMarkers();
-    }
+    this.markersLayer.addTo(this.map);
+    this.routesLayer.addTo(this.map);
 
-    // Centrer et ajuster la vue
-    this.map.invalidateSize();
+    setTimeout(() => {
+      this.map.invalidateSize();
+      this.mapReady.emit(this.map);
+    }, 200);
   }
 
-  private addMarkers(): void {
-    this.clearMarkers();
-    
-    this.markerPositions.forEach((position, index) => {
-      const marker = L.marker(position)
-        .addTo(this.map!)
-        .bindPopup(`Position ${index + 1}<br>Lat: ${position[0]}, Lng: ${position[1]}`);
-      
-      this.markers.push(marker);
+  /* ====== API PUBLIQUE ====== */
+
+  updateOrAddMarker(
+    key: string,
+    position: [number, number],
+    title?: string,
+    color: string = '#3b82f6'
+  ): void {
+    if (this.customMarkers.has(key)) {
+      this.customMarkers.get(key)!.setLatLng(position);
+      return;
+    }
+
+    const icon = L.divIcon({
+      html: `<div style="
+        background:${color};
+        width:18px;
+        height:18px;
+        border-radius:50%;
+        border:3px solid white;
+      "></div>`,
+      iconSize: [18, 18],
+      iconAnchor: [9, 9]
     });
+
+    const marker = L.marker(position, { icon });
+    if (title) marker.bindPopup(title);
+
+    marker.addTo(this.markersLayer);
+    this.customMarkers.set(key, marker);
   }
 
-  public clearMarkers(): void {
-    this.markers.forEach(marker => marker.remove());
-    this.markers = [];
-  }
-
-  public addMarker(lat: number, lng: number, popupText?: string): void {
-    const marker = L.marker([lat, lng]).addTo(this.map!);
-    
-    if (popupText) {
-      marker.bindPopup(popupText);
+  updateOrAddRoute(
+    key: string,
+    coordinates: [number, number][],
+    color: string = '#3b82f6',
+    weight: number = 4
+  ): void {
+    if (this.customRoutes.has(key)) {
+      this.customRoutes.get(key)!.setLatLngs(coordinates);
+      return;
     }
-    
-    this.markers.push(marker);
+
+    const polyline = L.polyline(coordinates, {
+      color: color,
+      weight: weight,
+      opacity: 0.7,
+      smoothFactor: 1
+    });
+
+    polyline.addTo(this.routesLayer);
+    this.customRoutes.set(key, polyline);
   }
 
-  public setView(lat: number, lng: number, zoom?: number): void {
-    this.map?.setView([lat, lng], zoom || this.zoom);
+  fitBounds(points: [number, number][]): void {
+    if (points.length > 0) {
+      this.map.fitBounds(points, { padding: [50, 50] });
+    }
   }
 
-  public getBounds(): L.LatLngBounds | null {
-    return this.map?.getBounds() || null;
+  setView(position: [number, number], zoom?: number): void {
+    this.map.setView(position, zoom || this.zoom);
+  }
+
+  zoomIn(): void {
+    this.map.zoomIn();
+  }
+
+  zoomOut(): void {
+    this.map.zoomOut();
+  }
+
+  resetView(): void {
+    this.map.setView(this.center, this.zoom);
   }
 
   ngOnDestroy(): void {
-    if (this.map) {
-      this.map.remove();
-      this.map = null;
-    }
+    this.map?.remove();
   }
 }

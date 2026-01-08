@@ -21,15 +21,17 @@ export interface Livraison {
   order_id: number;
   livreur_id: number;
   status: string;
+  en_route: string | null;
+  en_cours: string | null;
+  livrée: string | null;
+  echec_livraison: string | null;
   raison_echec: string | null;
   commentaire_echec: string | null;
-  date_livraison: string | null;
   created_at: string;
   updated_at: string;
   order: Order;
   livreur: Livreur;
 }
-
 export interface Order {
   id: number;
   date: string;
@@ -47,7 +49,7 @@ export interface Order {
   created_at: string;
   updated_at: string;
   user: User; // Client
-  order_items: OrderItem[]; 
+  order_items?: OrderItem[]; 
   livraison?: Livraison;
 }
 

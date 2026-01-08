@@ -1,9 +1,9 @@
 // src/app/components/order-assignment.component.ts (complet)
-import { Component, signal, OnInit, computed, inject } from '@angular/core';
+import { Component, signal, OnInit, computed, inject, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, ChevronLeft, User, ArrowRight, Save } from 'lucide-angular';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '../../services/order.service';
 import { LivreurService } from '../../services/livreur.service';
 import { Livreur } from '../../shared/interfaces/livreur.interface';
@@ -41,7 +41,8 @@ export class OrderAssignment implements OnInit {
   constructor(
     private orderService: OrderService,
     private livreurService: LivreurService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router,
   ) {}
 
   ngOnInit() {
@@ -127,6 +128,9 @@ export class OrderAssignment implements OnInit {
         
         if (this.isAssigned()) {
           this.toastService.success('Assignation mise à jour avec succès');
+          setTimeout(() => {
+            this.router.navigate(['/admin/orders-list']);
+          }, 3000);
         } else {
           this.toastService.success('Livreur assigné avec succès');
         }

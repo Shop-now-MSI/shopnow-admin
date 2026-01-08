@@ -107,7 +107,7 @@ export class OrdersList implements AfterViewInit, OnInit {
 
   // --- PAGINATION ---
   currentPage = signal(1);
-  itemsPerPage = signal(10); // Augmenté à 10 pour plus de visibilité
+  itemsPerPage = signal(5); // Augmenté à 10 pour plus de visibilité
   totalPages = computed(() => Math.ceil(this.filteredOrders().length / this.itemsPerPage()));
   
   paginatedOrders = computed(() => {

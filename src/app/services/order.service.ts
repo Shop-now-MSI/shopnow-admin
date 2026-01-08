@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Order, AssignLivreurRequest, UpdateAssignationRequest, CancelOrderRequest, Livraison } from '../shared/interfaces/order.interface';
+import { Position } from '../shared/interfaces/position.interface';
+import { LivraisonPreuve } from '../shared/interfaces/livraison-preuve.interface';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = 'http://localhost:8000/api/';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -46,10 +49,42 @@ export class OrderService {
       catchError(this.handleError)
     );
   }
-  
+
+  // Get livraisons by order ID: GET /livraisons/{id}
+  getLivraisonsById(id: string): Observable<Livraison> {
+    return this.http.get<Livraison>(`${this.apiUrl}livraisons/${id}`, { headers: this.getAuthHeaders() }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   // Cancel order: POST /commandes/annuler
   cancel(data: CancelOrderRequest): Observable<{ message: string; idCommande: number }> {
     return this.http.post<{ message: string; idCommande: number }>(`${this.apiUrl}commandes/annuler`, data, { headers: this.getAuthHeaders() }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Get position livreur: GET /livraisons/{livraisonId}/positions
+  // Retourne un tableau de positions et extrait la dernière (la plus récente)
+  getLivreurPosition(livraisonId: string): Observable<Position[]> {
+    return this.http.get<Position[]>(`${this.apiUrl}livraisons/${livraisonId}/positions`, { headers: this.getAuthHeaders() }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Geocode address using Nominatim
+  geocodeAddress(address: string): Observable<any[]> {
+    return this.http.get<any[]>(
+      'https://nominatim.openstreetmap.org/search',
+      { params: { q: address, format: 'json', limit: '1' } }
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Get preuves de livraison: GET /livraisons/{id}/preuves
+  getLivraisonPreuves(livraisonId: string): Observable<LivraisonPreuve[]> {
+    return this.http.get<LivraisonPreuve[]>(`${this.apiUrl}livraisons/${livraisonId}/preuves`, { headers: this.getAuthHeaders() }).pipe(
       catchError(this.handleError)
     );
   }

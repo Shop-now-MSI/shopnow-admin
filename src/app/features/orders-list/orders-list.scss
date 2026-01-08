@@ -222,6 +222,11 @@ h1 { font-size: 2rem; font-weight: 500; }
 .rating { display: flex; align-items: center; gap: 4px; color: #eab308; }
 
 /* ACTIONS */
+.action-buttons{
+  display: flex;
+  gap: 10px;
+}
+
 .actions { display: flex; gap: 8px; justify-content: flex-end; }
 .icon-btn {
   background: var(--bg-input);

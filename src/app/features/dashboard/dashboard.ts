@@ -48,10 +48,10 @@ export class Dashboard {
     this.loadDashboardStats();
     this.loadCouriers();
     
-    setInterval(() => {
-      this.loadDashboardStats();
-      this.loadCouriers();
-    }, 10000);
+    // setInterval(() => {
+    //   this.loadDashboardStats();
+    //   this.loadCouriers();
+    // }, 10000);
   }
 
   loadDashboardStats() {

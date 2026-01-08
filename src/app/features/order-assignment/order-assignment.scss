@@ -73,7 +73,7 @@
 h2 {
   font-size: 1.1rem;
   color: var(--text-main);
-  margin: 0;
+  margin-bottom: 25px;
 }
 
 /* GRID D'INFORMATIONS */
@@ -257,4 +257,47 @@ label{
     background: #fecaca;
     color: #b91c1c;
   }
+}
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .item-name {
+    font-weight: 500;
+    color: var(--text-main);
+  }
+
+  .item-quantity {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+}
+
+.item-price {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.order-total {
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }

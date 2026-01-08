@@ -123,8 +123,8 @@ exportToExcel(): void {
       ['Export généré le', new Date().toLocaleString('fr-FR')],
       [''],
       ['INFORMATIONS PERSONNELLES'],
-      ['Nom', livreur.name],
-      ['Prénom', livreur.firstname],
+      ['Nom', livreur.user.name],
+      ['Prénom', livreur.user.firstname],
       ['Email', livreur.user?.email],
       ['Téléphone', livreur.tel || 'Non renseigné'],
       ['Date de naissance', livreur.dateNaissance ? new Date(livreur.dateNaissance).toLocaleDateString('fr-FR') : 'Non renseigné'],
@@ -373,7 +373,7 @@ exportToExcel(): void {
     });
     
     // Nom du fichier
-    const fileName = `Export_Complet_Livreur_${livreur.firstname}_${livreur.name}_${new Date().toISOString().slice(0,10).replace(/-/g, '')}.xlsx`;
+    const fileName = `Export_Complet_Livreur_${livreur.user.firstname}_${livreur.user.name}_${new Date().toISOString().slice(0,10).replace(/-/g, '')}.xlsx`;
     
     // Télécharger
     saveAs(blob, fileName);

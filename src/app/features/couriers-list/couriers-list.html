@@ -103,11 +103,12 @@
                 <td>
                   <div class="user-cell">
                     <img [src]="courier.photo || 'https://i.pravatar.cc/150?u=' + courier.user_id" 
-                         alt="{{ courier.firstname }} {{ courier.name }}" 
+                         alt="{{ courier.user.firstname }} {{ courier.user.name }}" 
                          class="user-avatar">
                     <div class="user-info">
-                      <span class="user-name">{{ courier.firstname }} {{ courier.name }}</span>
-                      <span class="user-id">ID: {{ courier.user_id }}</span>
+                      <span class="user-name">{{ courier.user.firstname }} {{ courier.user.name }}</span>
+                      <br/>
+                      <span class="user-id"># {{ courier.user_id }}</span>
                     </div>
                   </div>
                 </td>
@@ -157,8 +158,8 @@
         <div class="items-per-page">
           <label>Afficher</label>
           <select class="select-small" (change)="onItemsPerPageChange($event)">
-            <option value="5">5</option>
-            <option value="10" selected>10</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
           </select>

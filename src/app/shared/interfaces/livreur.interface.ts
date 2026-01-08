@@ -2,8 +2,6 @@
 
 export interface Livreur {
   user_id: number;
-  name: string;
-  firstname: string;
   tel: string;
   dateNaissance: string; // Format date, ex. 'YYYY-MM-DD'
   typeVehicule: string;

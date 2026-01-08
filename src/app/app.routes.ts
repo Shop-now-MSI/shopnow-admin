@@ -30,7 +30,7 @@ export const routes: Routes = [
       { path: 'order-assignment/:id', component: OrderAssignment },
       { path: 'orders-list', component: OrdersList },
       { path: 'coursier-details', component: CoursierDetails },
-      { path: 'order-tracking', component: OrderTracking },
+      { path: 'order-tracking/:id', component: OrderTracking },
       { path: 'profile', component: ProfileComponent },  
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

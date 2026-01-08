@@ -111,7 +111,10 @@
               <td colspan="10" class="empty-state">
                 @if (selectedStatus() || searchQuery()) {
                   <p>Aucune commande ne correspond à vos filtres</p>
-                  <button class="btn-text" (click)="clearFilters()">Effacer les filtres</button>
+                  <button class="btn-clear" (click)="clearFilters()" [disabled]="!selectedStatus() && !selectedPeriod() && !searchQuery()">
+                    <lucide-icon [img]="trash"></lucide-icon>
+                    Effacer les filtres
+                  </button>
                 } @else {
                   <p>Aucune commande disponible</p>
                 }
@@ -163,9 +166,11 @@
                     <button class="icon-btn" title="Détails" routerLink="/admin/order-assignment/{{ order.id }}">
                       <lucide-icon [img]="eye"></lucide-icon>
                     </button>
-                    <button class="icon-btn" title="Suivre" routerLink="/admin/order-tracking">
-                      <lucide-icon [img]="ArrowBigRightDash"></lucide-icon>
-                    </button>
+                    @if(order.livraison){
+                      <button class="icon-btn" title="Suivre" routerLink="/admin/order-tracking/{{order.livraison.id}}">
+                        <lucide-icon [img]="ArrowBigRightDash"></lucide-icon>
+                      </button>
+                    }
                   </div>
                 </td>
               </tr>
@@ -186,8 +191,8 @@
         <div class="items-per-page">
           <label>Afficher</label>
           <select class="select-small" (change)="onItemsPerPageChange($event)">
-            <option value="5">5</option>
-            <option value="10" selected>10</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
           </select>

@@ -6,8 +6,8 @@
           <lucide-icon [img]="chevronLeft"></lucide-icon>
         </button>
         <div class="title-info">
-          <h1>Suivi de livraison</h1>
-          <p class="subtitle">Livraison #{{ order().deliveryId }} • Commande #{{ order().commandId }}</p>
+         <h1>Suivi de livraison</h1>
+         <p class="subtitle">Livraison #{{ livraison()?.id }} • Commande #{{ livraison()?.order_id }}</p>
         </div>
       </div>
     </div>
@@ -18,126 +18,193 @@
       </button>
     </div>
   </header>
-
+  
   <div class="content-grid">
     <!-- Colonne Gauche -->
     <div class="left-column">
       <!-- Progression de la livraison -->
       <section class="content-card tracking-card">
         <h2>Progression de la livraison</h2>
-        
+       
         <div class="tracking-timeline">
-          @for (step of trackingSteps(); track step.id) {
-            <div class="timeline-step" [class.completed]="step.status === 'completed'" [class.current]="step.status === 'current'" [class.pending]="step.status === 'pending'">
-              <div class="step-icon">
-                @if (step.status === 'completed') {
-                  <lucide-icon [img]="checkCircle"></lucide-icon>
-                } @else if (step.status === 'current') {
-                  <lucide-icon [img]="truckIcon"></lucide-icon>
-                } @else {
-                  <div class="icon-placeholder"></div>
-                }
-              </div>
-              
-              <div class="step-content">
-                <div class="step-header">
-                  <h3>{{ step.title }}</h3>
-                  @if (step.badge) {
-                    <span class="badge-current">{{ step.badge }}</span>
-                  }
-                  <span class="step-time" [class.highlight]="step.status === 'current'">{{ step.time }}</span>
-                </div>
-                <p class="step-description">{{ step.description }}</p>
-              </div>
+          @if(livraison()?.status == "echec"){
+            <div class="step-header">
+              Livraison annulée
+              <span class="step-time" [class.highlight]="livraison()?.status === 'current'">{{ livraison()?.echec_livraison!.toLocaleString() }}</span>
             </div>
+            <p class="step-description">
+              {{ livraison()?.raison_echec! }}
+            </p>
+          }@else {
+            @for (step of trackingSteps(); track step.id) {
+              <div class="timeline-step" [class.completed]="step.status === 'completed'" [class.current]="step.status === 'current'" [class.pending]="step.status === 'pending'">
+                <div class="step-icon">
+                  @if (step.status === 'completed') {
+                    <lucide-icon [img]="checkCircle"></lucide-icon>
+                  } @else if (step.status === 'current') {
+                    <lucide-icon [img]="truckIcon"></lucide-icon>
+                  } @else {
+                    <div class="icon-placeholder"></div>
+                  }
+                </div>
+               
+                <div class="step-content">
+                  <div class="step-header">
+                    <h3>{{ step.title }}</h3>
+                    @if (step.badge) {
+                      <span class="badge-current">{{ step.badge }}</span>
+                    }
+                    <span class="step-time" [class.highlight]="step.status === 'current'">{{ step.time }}</span>
+                  </div>
+                  <p class="step-description">{{ step.description }}</p>
+                </div>
+              </div>
+            }
           }
+        
         </div>
       </section>
-
+      
       <!-- Détails de la commande -->
       <section class="content-card order-details-card">
         <h2>Détails de la commande</h2>
-        
+       
         <div class="order-items">
-          @for (item of orderItems(); track item.name) {
+          @for (item of orderItems(); track item.id) {
             <div class="item-row">
               <div class="item-info">
-                <span class="item-name">{{ item.name }}</span>
-                <span class="item-quantity">Quantité: {{ item.quantity }}</span>
+                <span class="item-name">{{ item.product.name }}</span>
+                <span class="item-quantity">Quantité: {{ item.quantite }}</span>
               </div>
-              <span class="item-price">{{ item.price | number:'1.2-2' }} €</span>
+              <span class="item-price">{{ item.product.price | number:'1.2-2' }} Fcfa</span>
             </div>
           }
         </div>
-
+        
         <div class="order-total">
           <div class="payment-info">
-            <lucide-icon [img]="checkCircle" class="icon-small payment-icon"></lucide-icon>
-            <span>Paiement à la livraison</span>
+            <lucide-icon [img]="creditCard" class="icon-small payment-icon"></lucide-icon>
+            <span>{{ order()?.payment_method | titlecase }}</span>
           </div>
           <div class="total-row">
             <span class="total-label">Total</span>
-            <span class="total-amount">{{ calculateTotal() | number:'1.2-2' }} €</span>
+            <span class="total-amount">{{ calculateTotal() | number:'1.2-2' }} Fcfa</span>
           </div>
         </div>
       </section>
-    </div>
 
+      <!-- Preuve de livraison -->
+      @if (preuves().length > 0) {
+        <section class="content-card proof-card">
+          <h2>Preuve de livraison</h2>
+          
+          <div class="proof-list">
+            @for (preuve of preuves(); track preuve.id) {
+              <div class="proof-item">
+                <div class="proof-header">
+                  <div class="proof-type">
+                    <lucide-icon [img]="getPreuveIcon(preuve.type)" class="icon-small proof-icon"></lucide-icon>
+                    <span class="proof-label">{{ getPreuveLabel(preuve.type) }}</span>
+                  </div>
+                  <span class="proof-date">{{ preuve.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                
+                @if (preuve.type === 'QR' && preuve.qr_value) {
+                  <div class="proof-content qr-content">
+                    <div class="qr-value">
+                      <span class="qr-label">Code QR:</span>
+                      <span class="qr-text">{{ preuve.qr_value }}</span>
+                    </div>
+                  </div>
+                }
+                
+                @if ((preuve.type === 'PHOTO' || preuve.type === 'SIGNATURE') && preuve.file_url) {
+                  <div class="proof-content image-content">
+                    <img [src]="preuve.file_url" [alt]="getPreuveLabel(preuve.type)" class="proof-image" (click)="openPreuve(preuve)">
+                    <button class="btn-view-proof" (click)="openPreuve(preuve)">
+                      Voir en grand
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </section>
+      }
+    </div>
+    
     <!-- Colonne Droite -->
     <div class="right-column">
       <!-- Carte Livreur -->
       <section class="content-card courier-card">
         <h2>Livreur</h2>
-        
+       
         <div class="courier-info">
-          <img [src]="courier().avatar" alt="Avatar livreur" class="courier-avatar">
+          <img [src]="courier()?.photo || 'https://i.pravatar.cc/150?u=' + courier()?.user_id" alt="Avatar livreur" class="courier-avatar">
           <div class="courier-details">
-            <h3>{{ courier().name }}</h3>
-            <p class="courier-vehicle">{{ courier().vehicle }} • {{ courier().plate }}</p>
+            <h3>{{ courier()?.user!.firstname }} {{ courier()?.user!.name }}</h3>
+            <p class="courier-vehicle">{{ courier()?.typeVehicule }} • {{ courier()?.matricule }}</p>
           </div>
         </div>
-
+        
         <button class="btn-contact-full" (click)="contactCourier()">
           <lucide-icon [img]="phoneIcon" class="icon-small"></lucide-icon>
-          {{ courier().phone }}
+          {{ courier()?.tel }}
         </button>
       </section>
-
+      
       <!-- Localisation en temps réel -->
       <section class="content-card map-card">
-        <h2>Localisation en temps réel</h2>
+        <div class="map-header">
+          <h2>Suivi de la livraison</h2>
+          <button class="btn-fullscreen" (click)="toggleFullscreen()" title="Mode plein écran">
+            <lucide-icon [img]="maximize" class="icon-small"></lucide-icon>
+          </button>
+        </div>
         
-        <div class="map-container">
-          <div class="map-placeholder">
-            <img src="assets/images/delivery-route-map.png" alt="Carte">
-          </div>
-          <div class="estimated-time">
-            <lucide-icon [img]="cancel" class="icon-small"></lucide-icon>
-            <span>Arrivée estimée: {{ order().estimatedTime }}</span>
+        <!-- Temps estimé d'arrivée -->
+        <div class="estimated-time">
+          <lucide-icon [img]="clockIcon" class="icon-small"></lucide-icon>
+          <span>Arrivée estimée: <strong>{{ estimatedTime() }}</strong></span>
+        </div>
+        
+        <div class="map-wrapper">
+          <app-map
+            [center]="center"
+            [zoom]="zoom"
+            [showControls]="false">
+          </app-map>
+          
+          <!-- Contrôles de la carte -->
+          <div class="tracking-controls">
+            <button class="control-btn" (click)="showCourier()" title="Centrer sur le livreur">
+              <lucide-icon [img]="truckIcon" class="icon-small"></lucide-icon>
+              Livreur
+            </button>
+            <button class="control-btn" (click)="showClient()" title="Centrer sur le client">
+              <lucide-icon [img]="mapPin" class="icon-small"></lucide-icon>
+              Client
+            </button>
           </div>
         </div>
       </section>
-
+      
       <!-- Carte Client -->
       <section class="content-card client-card">
         <h2>Client</h2>
-        
+       
         <div class="client-info">
           <div class="info-row">
             <lucide-icon [img]="userIcon" class="icon-small"></lucide-icon>
-            <span>{{ client().name }}</span>
+            <span>{{ client()?.firstname }} {{ client()?.name }}</span>
           </div>
           <div class="info-row">
             <lucide-icon [img]="mapPin" class="icon-small"></lucide-icon>
-            <span>{{ client().address }}</span>
-          </div>
-          <div class="info-row">
-            <lucide-icon [img]="phoneIcon" class="icon-small"></lucide-icon>
-            <span>{{ client().phone }}</span>
+            <span>{{ order()?.address }}, {{ order()?.zip }} {{ order()?.city }}</span>
           </div>
           <div class="info-row">
             <lucide-icon [img]="mailIcon" class="icon-small"></lucide-icon>
-            <span>{{ client().email }}</span>
+            <span>{{ client()?.email }}</span>
           </div>
         </div>
       </section>
